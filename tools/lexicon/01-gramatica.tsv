@@ -1,0 +1,226 @@
+# Palabras gramaticales: partículas, pronombres, clasificadores, adverbios,
+# preposiciones/coverbos, conjunciones y modales. Formato: palabra <TAB> glosa.
+的	de (partícula posesiva / de relativo)
+地	-mente (partícula que forma adverbios)
+得	(partícula de complemento: "tan... que", "de manera que")
+了	ya / (partícula de acción completada o de cambio)
+着	(partícula de acción en curso: estar -ndo)
+过	(partícula de experiencia: haber -ado alguna vez)
+吗	¿...? (partícula de pregunta sí/no)
+呢	¿y...? / (partícula de pregunta o de continuidad)
+吧	(partícula de sugerencia o suposición: ¿no?, venga)
+啊	ah / (partícula de énfasis)
+呀	(partícula de énfasis suavizada)
+哦	oh
+嗯	mm / vale
+哈	ja
+啦	(fusión de 了 + 啊: ¡ya está!)
+嘛	(partícula: "¡pues claro!", "es que...")
+所	(partícula que forma relativas de objeto)
+之	de (partícula posesiva clásica)
+者	el que / -ista (sufijo de agente)
+们	(sufijo de plural para personas)
+把	(marca el objeto antepuesto: "coger X y...")
+被	por (marca de voz pasiva)
+将	(marca de objeto antepuesto, formal) / va a
+是	ser / estar / sí
+不	no
+没	no (haber) / no (tener)
+没有	no hay / no tener / no haber (hecho)
+别	no (prohibición: no lo hagas)
+甭	no hace falta que
+我	yo / me
+你	tú / te
+您	usted
+他	él / lo
+她	ella / la
+它	ello / lo (cosas y animales)
+我们	nosotros
+咱们	nosotros (incluyéndote)
+你们	vosotros / ustedes
+他们	ellos
+她们	ellas
+它们	ellos (cosas)
+自己	uno mismo / propio
+大家	todos / todo el mundo
+别人	otra persona / los demás
+人家	los demás / uno (yo)
+这	este / esto
+那	ese / aquel / eso
+哪	cuál / qué
+这儿	aquí
+这里	aquí
+那儿	ahí / allí
+那里	ahí / allí
+哪儿	dónde
+哪里	dónde
+这个	este / esto
+那个	ese / eso
+哪个	cuál
+这些	estos
+那些	esos
+哪些	cuáles
+什么	qué
+谁	quién
+怎么	cómo / por qué
+怎么样	qué tal
+为什么	por qué
+多少	cuánto
+几	cuántos (pocos) / unos cuantos
+多	mucho / cuán
+个	(clasificador general)
+位	(clasificador de personas, respetuoso)
+只	(clasificador de animales) / sólo
+条	(clasificador de cosas alargadas)
+张	(clasificador de superficies planas)
+本	(clasificador de libros) / raíz
+件	(clasificador de prendas y asuntos)
+辆	(clasificador de vehículos)
+双	par (clasificador)
+些	unos cuantos
+点	un poco / punto / hora en punto
+种	tipo / clase (clasificador) / plantar
+次	vez (clasificador de veces)
+遍	vez (de principio a fin)
+下	vez (breve) / abajo / bajar
+杯	vaso / taza (clasificador)
+碗	cuenco (clasificador)
+块	trozo / yuan (clasificador)
+层	piso / capa (clasificador)
+段	tramo / párrafo (clasificador)
+句	frase (clasificador)
+封	(clasificador de cartas)
+家	casa / familia / (clasificador de negocios)
+座	(clasificador de edificios y montañas)
+台	(clasificador de aparatos) / plataforma
+套	juego / conjunto (clasificador)
+份	porción / ejemplar (clasificador)
+名	(clasificador de personas por su cargo)
+都	todos / ya
+也	también / tampoco
+还	todavía / además
+还是	o / aun así / mejor
+就	entonces / ya / precisamente
+才	sólo entonces / no hasta / sólo
+再	otra vez / luego
+又	otra vez (ya ocurrido) / además
+很	muy
+太	demasiado
+非常	muy / enormemente
+真	de verdad / realmente
+最	el más (superlativo)
+更	más (comparativo)
+比较	bastante / comparativamente
+特别	especialmente / especial
+极	sumamente
+挺	bastante
+有点儿	un poco (de algo molesto)
+一点儿	un poco
+一些	unos cuantos
+只是	sólo que / simplemente
+只有	sólo hay / sólo si
+不但	no sólo
+而且	y además
+但是	pero
+可是	pero
+不过	pero / sólo que
+虽然	aunque
+然而	sin embargo
+因为	porque
+所以	así que
+由于	debido a
+因此	por eso
+如果	si (condicional)
+要是	si (condicional, coloquial)
+的话	si
+那么	entonces / tan
+既然	ya que
+无论	sea cual sea
+不管	sea cual sea
+只要	con tal de que
+除非	a menos que
+即使	aunque (hipotético)
+除了	aparte de / excepto
+以外	además de / fuera de
+连	incluso / hasta / conectar
+甚至	incluso
+并且	y además
+或者	o
+还有	y además / también hay
+和	y / con
+跟	con / y / seguir
+与	y / con (formal)
+及	y (formal)
+在	en / estar en / (estar) -ndo
+从	desde
+到	hasta / llegar
+向	hacia
+往	hacia
+朝	hacia
+对	a / hacia / correcto
+对于	respecto a
+关于	acerca de
+给	a / para / dar
+为	para / por
+为了	para (finalidad)
+由	por (agente) / a cargo de
+用	con / usar
+拿	con / coger
+按照	según
+根据	según
+通过	mediante / pasar / aprobar
+离	de (distancia respecto a)
+沿着	a lo largo de
+会	saber / poder / va a
+能	poder (ser capaz)
+可以	poder (estar permitido)
+可能	quizá / posible
+要	querer / ir a / hacer falta
+想	querer / pensar / echar de menos
+愿意	estar dispuesto a
+应该	deber / debería
+必须	tener que
+需要	necesitar
+敢	atreverse a
+肯	estar dispuesto a
+得	tener que
+正在	ahora mismo
+正	justo ahora
+已经	ya
+曾经	una vez (en el pasado)
+刚	acabar de
+刚才	hace un momento
+马上	enseguida
+立刻	al instante
+终于	por fin
+总是	siempre
+经常	a menudo
+常常	a menudo
+有时候	a veces
+从来	nunca (jamás)
+一直	todo el tiempo / siempre
+仍然	todavía
+一定	seguro / sin falta
+肯定	seguro / afirmar
+也许	quizá
+大概	probablemente / más o menos
+恐怕	me temo que
+其实	en realidad
+当然	por supuesto
+一般	en general / normal
+差不多	casi / más o menos
+几乎	casi
+至少	al menos
+一共	en total
+一起	juntos
+互相	mutuamente
+亲自	en persona
+突然	de repente
+渐渐	poco a poco
+越来越	cada vez más
+越	cuanto más
+仅仅	solamente
+反正	total / de todas formas
+到底	al fin y al cabo / ¿pero qué...?
+难道	¿acaso...?
+究竟	en definitiva

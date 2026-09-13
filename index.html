@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leer chino — análisis sintáctico, pinyin y traducción</title>
+<meta name="description" content="Pega un texto en chino y obtén su análisis sintáctico, el pinyin, la traducción al español y una explicación de cada construcción gramatical.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%239a3412'/%3E%3Ctext x='16' y='23' font-size='21' text-anchor='middle' fill='%23fff' font-family='sans-serif'%3E%E4%B8%AD%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+
+<header class="cabecera">
+  <div class="marca">
+    <span class="logo">中</span>
+    <div>
+      <h1>Leer chino</h1>
+      <p class="lema">Pega un texto y mira cómo está construido</p>
+    </div>
+  </div>
+  <div class="acciones-cabecera">
+    <button type="button" id="btn-ejemplos" class="boton-plano">Ejemplos</button>
+    <button type="button" id="btn-ayuda" class="boton-plano">Cómo se usa</button>
+  </div>
+</header>
+
+<main>
+  <section class="paneles">
+
+    <!-- ------------------------------- chino ------------------------------ -->
+    <div class="panel panel-chino">
+      <div class="panel-cabecera">
+        <h2>Chino</h2>
+        <div class="opciones">
+          <label><input type="checkbox" id="op-pinyin" checked> pinyin</label>
+          <label><input type="checkbox" id="op-glosa"> glosa</label>
+          <label><input type="checkbox" id="op-papeles" checked> papeles</label>
+        </div>
+      </div>
+
+      <textarea id="entrada" class="entrada" rows="3" spellcheck="false"
+        placeholder="他把手机忘在出租车上了。"></textarea>
+
+      <div class="barra-entrada">
+        <span id="contador" class="contador"></span>
+        <button type="button" id="btn-limpiar" class="boton-plano">Limpiar</button>
+      </div>
+
+      <div id="salida-chino" class="salida" aria-live="polite"></div>
+      <div id="leyenda" class="leyenda"></div>
+    </div>
+
+    <!-- ------------------------------ español ----------------------------- -->
+    <div class="panel panel-espanol">
+      <div class="panel-cabecera">
+        <h2>Español</h2>
+        <div class="pestanas" role="tablist">
+          <button type="button" class="pestana activa" data-vista="estructural" role="tab">Estructural</button>
+          <button type="button" class="pestana" data-vista="ia" role="tab">Natural (IA)</button>
+        </div>
+      </div>
+
+      <div id="vista-estructural" class="vista">
+        <h3 class="subtitulo">Pinyin</h3>
+        <div id="salida-pinyin" class="salida salida-py" aria-live="polite"></div>
+
+        <h3 class="subtitulo">Traducción estructural</h3>
+        <p class="aviso-vista">
+          Traducción construida a partir del análisis: cada trozo del español sale
+          de un trozo concreto del chino, por eso se pueden resaltar los dos lados
+          a la vez. Es literal a propósito, no literaria.
+        </p>
+        <div id="salida-espanol" class="salida salida-es" aria-live="polite"></div>
+      </div>
+
+      <div id="vista-ia" class="vista oculta">
+        <p class="aviso-vista">
+          Traducción natural pedida a la API de Claude. Necesita una clave propia,
+          que se guarda sólo en este navegador y no se envía a ningún otro sitio.
+        </p>
+        <div class="fila-clave">
+          <input type="password" id="clave-api" class="campo" placeholder="sk-ant-..." autocomplete="off">
+          <button type="button" id="btn-traducir-ia" class="boton">Traducir</button>
+        </div>
+        <div id="salida-ia" class="salida salida-es" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ------------------------------ gramática ----------------------------- -->
+  <section class="gramatica">
+    <div class="panel-cabecera">
+      <h2>Gramática</h2>
+      <div class="opciones">
+        <label for="op-nivel">nivel</label>
+        <select id="op-nivel" class="campo campo-pequeno">
+          <option value="3">todo</option>
+          <option value="2">hasta intermedio</option>
+          <option value="1">sólo lo básico</option>
+        </select>
+      </div>
+    </div>
+    <div id="salida-gramatica" class="tarjetas"></div>
+  </section>
+</main>
+
+<!-- ficha de la palabra sobre la que está el cursor -->
+<div id="ficha" class="ficha oculta" role="dialog" aria-label="Detalle de la palabra"></div>
+
+<!-- diálogos -->
+<div id="modal" class="modal oculta">
+  <div class="modal-caja">
+    <button type="button" id="modal-cerrar" class="modal-cerrar" aria-label="Cerrar">&times;</button>
+    <div id="modal-contenido"></div>
+  </div>
+</div>
+
+<footer class="pie">
+  <span id="estado-dicc">Cargando diccionario…</span>
+  <span class="separador">·</span>
+  <span>Diccionario: CC-CEDICT (CC BY-SA 4.0) · frecuencias de jieba · pinyin de pypinyin</span>
+</footer>
+
+<script src="data/lexicon-core.js"></script>
+<script src="data/chars.js"></script>
+<script src="data/es-lexicon.js"></script>
+<script src="data/meta.js"></script>
+<script src="js/lexico.js"></script>
+<script src="js/glosa.js"></script>
+<script src="js/pinyin.js"></script>
+<script src="js/segmentador.js"></script>
+<script src="js/etiquetas.js"></script>
+<script src="js/patrones.js"></script>
+<script src="js/construcciones.js"></script>
+<script src="js/construcciones-2.js"></script>
+<script src="js/construcciones-3.js"></script>
+<script src="js/analisis.js"></script>
+<script src="js/traduccion.js"></script>
+<script src="js/ejemplos.js"></script>
+<script src="js/ui.js"></script>
+</body>
+</html>

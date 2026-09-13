@@ -1,0 +1,504 @@
+/* Hoja de estilo única. Paleta clara y oscura, tipografía sobria y una escala
+ * de color por papel sintáctico que es la misma en los dos paneles: lo que en
+ * chino sale subrayado en azul, en español sale subrayado en azul. */
+
+:root {
+  color-scheme: light dark;
+
+  --fondo: #faf8f5;
+  --fondo-panel: #ffffff;
+  --fondo-hundido: #f2efe9;
+  --borde: #e3ddd2;
+  --borde-fuerte: #cec6b7;
+  --texto: #1e1c18;
+  --texto-suave: #6b645a;
+  --texto-tenue: #928a7d;
+  --acento: #9a3412;
+  --acento-suave: #fde9dd;
+  --sombra: 0 1px 2px rgba(30, 28, 24, .06), 0 8px 24px rgba(30, 28, 24, .05);
+
+  /* papeles sintácticos */
+  --c-sujeto: #1d4ed8;
+  --c-tema: #4338ca;
+  --c-verbo: #b91c1c;
+  --c-objeto: #15803d;
+  --c-circunstancia: #b45309;
+  --c-coverbo: #7e22ce;
+  --c-modal: #0e7490;
+  --c-aspecto: #737373;
+  --c-complemento: #c2410c;
+  --c-negacion: #be185d;
+  --c-conector: #4f46e5;
+  --c-final: #78716c;
+  --c-atributo: #0891b2;
+  --c-neutro: #a8a29e;
+
+  --fuente: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --fuente-han: "Noto Sans CJK SC", "Source Han Sans SC", "PingFang SC", "Hiragino Sans GB",
+                "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fondo: #17150f;
+    --fondo-panel: #1f1d17;
+    --fondo-hundido: #26231b;
+    --borde: #383327;
+    --borde-fuerte: #4d4634;
+    --texto: #f0ece2;
+    --texto-suave: #b5ac99;
+    --texto-tenue: #8a8171;
+    --acento: #f97316;
+    --acento-suave: #3a2415;
+    --sombra: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .25);
+
+    --c-sujeto: #7ba7ff;
+    --c-tema: #a5a0ff;
+    --c-verbo: #ff8f8f;
+    --c-objeto: #6ee7a0;
+    --c-circunstancia: #f0b95c;
+    --c-coverbo: #d6a4ff;
+    --c-modal: #67d5e8;
+    --c-aspecto: #b0aaa0;
+    --c-complemento: #ffa470;
+    --c-negacion: #ff9ec4;
+    --c-conector: #a5b4fc;
+    --c-final: #b8b2a7;
+    --c-atributo: #67d5e8;
+    --c-neutro: #8d8679;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: var(--fuente);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ------------------------------ cabecera ------------------------------ */
+
+.cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--borde);
+  background: var(--fondo-panel);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.marca { display: flex; align-items: center; gap: 12px; }
+.logo {
+  display: grid;
+  place-items: center;
+  width: 38px; height: 38px;
+  border-radius: 9px;
+  background: var(--acento);
+  color: #fff;
+  font-family: var(--fuente-han);
+  font-size: 22px;
+  line-height: 1;
+}
+.cabecera h1 { margin: 0; font-size: 17px; font-weight: 650; letter-spacing: -.01em; }
+.lema { margin: 0; font-size: 12.5px; color: var(--texto-suave); }
+.acciones-cabecera { display: flex; gap: 6px; }
+
+/* -------------------------------- base -------------------------------- */
+
+main { padding: 20px; max-width: 1400px; margin: 0 auto; }
+
+.paneles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.panel, .gramatica {
+  background: var(--fondo-panel);
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  box-shadow: var(--sombra);
+  padding: 14px 16px 16px;
+}
+.gramatica { margin-top: 18px; }
+
+.panel-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--borde);
+}
+.panel-cabecera h2 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: .09em;
+  color: var(--texto-suave);
+}
+
+.opciones { display: flex; align-items: center; gap: 12px; font-size: 12.5px; color: var(--texto-suave); }
+.opciones label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+.opciones input[type=checkbox] { accent-color: var(--acento); margin: 0; }
+
+/* ------------------------------ controles ----------------------------- */
+
+.boton, .boton-plano {
+  font: inherit;
+  font-size: 13px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid var(--borde-fuerte);
+  padding: 6px 12px;
+  transition: background .12s, border-color .12s;
+}
+.boton { background: var(--acento); border-color: var(--acento); color: #fff; font-weight: 550; }
+.boton:hover { filter: brightness(1.08); }
+.boton-plano { background: transparent; color: var(--texto-suave); }
+.boton-plano:hover { background: var(--fondo-hundido); color: var(--texto); }
+.boton[disabled] { opacity: .55; cursor: default; }
+
+.campo {
+  font: inherit;
+  font-size: 13px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--borde-fuerte);
+  background: var(--fondo);
+  color: var(--texto);
+  width: 100%;
+}
+.campo-pequeno { width: auto; padding: 4px 8px; font-size: 12.5px; }
+.campo:focus, .entrada:focus { outline: 2px solid var(--acento); outline-offset: -1px; }
+
+.entrada {
+  width: 100%;
+  min-height: 84px;
+  resize: vertical;
+  font-family: var(--fuente-han);
+  font-size: 20px;
+  line-height: 1.7;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--borde-fuerte);
+  background: var(--fondo);
+  color: var(--texto);
+}
+.entrada::placeholder { color: var(--texto-tenue); }
+
+.barra-entrada {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 6px 0 4px;
+  font-size: 12px;
+  color: var(--texto-tenue);
+}
+.contador { font-variant-numeric: tabular-nums; }
+
+.pestanas { display: flex; gap: 2px; background: var(--fondo-hundido); padding: 2px; border-radius: 8px; }
+.pestana {
+  font: inherit; font-size: 12.5px;
+  border: 0; background: transparent; color: var(--texto-suave);
+  padding: 5px 11px; border-radius: 6px; cursor: pointer;
+}
+.pestana.activa { background: var(--fondo-panel); color: var(--texto); font-weight: 550; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+
+.vista.oculta, .oculta { display: none !important; }
+.aviso-vista {
+  margin: 0 0 10px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--texto-suave);
+  background: var(--fondo-hundido);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+.fila-clave { display: flex; gap: 8px; margin-bottom: 12px; }
+.fila-clave .campo { flex: 1; }
+
+/* --------------------------- texto analizado -------------------------- */
+
+.salida { min-height: 60px; }
+
+.oracion { margin-bottom: 14px; }
+.oracion:last-child { margin-bottom: 0; }
+
+.palabra {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: bottom;
+  margin: 0 1px 10px;
+  padding: 1px 3px 3px;
+  border-radius: 5px;
+  cursor: default;
+  transition: background .1s;
+}
+.palabra:hover { background: var(--acento-suave); }
+
+.py {
+  font-size: 11.5px;
+  line-height: 1.3;
+  color: var(--texto-tenue);
+  letter-spacing: .01em;
+  white-space: nowrap;
+}
+.han {
+  font-family: var(--fuente-han);
+  font-size: 25px;
+  line-height: 1.35;
+  border-bottom: 2.5px solid transparent;
+  padding-bottom: 1px;
+}
+.gl {
+  font-size: 11px;
+  line-height: 1.3;
+  color: var(--texto-suave);
+  max-width: 9em;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.palabra.puntuacion .han { font-size: 22px; color: var(--texto-tenue); }
+.palabra.desconocida .han { border-bottom-style: dotted; }
+
+/* subrayado por papel sintáctico, igual en los dos paneles */
+.p-sujeto      .han, .seg.p-sujeto      { border-bottom-color: var(--c-sujeto); }
+.p-tema        .han, .seg.p-tema        { border-bottom-color: var(--c-tema); }
+.p-verbo       .han, .seg.p-verbo       { border-bottom-color: var(--c-verbo); }
+.p-objeto      .han, .seg.p-objeto      { border-bottom-color: var(--c-objeto); }
+.p-tiempo      .han, .seg.p-tiempo,
+.p-lugar       .han, .seg.p-lugar,
+.p-adverbio    .han, .seg.p-adverbio    { border-bottom-color: var(--c-circunstancia); }
+.p-coverbo     .han, .seg.p-coverbo,
+.p-compl_coverbo .han                   { border-bottom-color: var(--c-coverbo); }
+.p-modal       .han, .seg.p-modal,
+.p-foco        .han, .seg.p-foco        { border-bottom-color: var(--c-modal); }
+.p-aspecto     .han, .seg.p-aspecto     { border-bottom-color: var(--c-aspecto); }
+.p-complemento .han, .seg.p-complemento { border-bottom-color: var(--c-complemento); }
+.p-negacion    .han, .seg.p-negacion    { border-bottom-color: var(--c-negacion); }
+.p-conector    .han, .seg.p-conector    { border-bottom-color: var(--c-conector); }
+.p-final       .han, .seg.p-final       { border-bottom-color: var(--c-final); }
+
+body.sin-papeles .han { border-bottom-color: transparent !important; }
+body.sin-papeles .seg { border-bottom-color: transparent !important; }
+
+/* resaltado al pasar el cursor o al elegir una construcción */
+.palabra.activa { background: var(--acento-suave); box-shadow: inset 0 0 0 1px var(--borde-fuerte); }
+.palabra.clave .han { font-weight: 650; }
+body.enfocando .palabra:not(.activa) { opacity: .32; }
+body.enfocando .seg:not(.activa) { opacity: .32; }
+
+/* --------------------------- panel de español -------------------------- */
+
+.salida-es { font-size: 16px; line-height: 2.1; }
+.frase-es { margin-bottom: 10px; }
+.seg {
+  display: inline;
+  border-bottom: 2.5px solid transparent;
+  padding-bottom: 1px;
+  margin-right: 5px;
+  border-radius: 2px;
+  cursor: default;
+  transition: background .1s;
+}
+.seg:hover, .seg.activa { background: var(--acento-suave); }
+.seg.solo-ingles { color: var(--texto-suave); font-style: italic; }
+.seg.solo-ingles::after { content: " (en inglés)"; font-size: 10.5px; color: var(--texto-tenue); font-style: normal; }
+.frase-es .seg:last-of-type { margin-right: 0; }
+
+.subtitulo {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: .09em;
+  color: var(--texto-tenue);
+}
+.salida-py {
+  font-size: 15px;
+  line-height: 1.95;
+  color: var(--texto);
+  margin-bottom: 18px;
+  min-height: 0;
+}
+.salida-py .seg { margin-right: 6px; }
+.salida-py .seg-py { color: var(--texto-suave); }
+
+.texto-ia { font-size: 16px; line-height: 1.75; }
+.notas-ia { margin-top: 12px; font-size: 13px; color: var(--texto-suave); }
+.notas-ia li { margin-bottom: 4px; }
+.error {
+  color: var(--acento);
+  background: var(--acento-suave);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+/* ------------------------------- leyenda ------------------------------- */
+
+.leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--borde);
+  font-size: 11.5px;
+  color: var(--texto-suave);
+}
+.leyenda:empty { display: none; }
+.leyenda span { display: inline-flex; align-items: center; gap: 5px; cursor: help; }
+.leyenda i { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
+
+/* ------------------------------ gramática ------------------------------ */
+
+.tarjetas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+
+.tarjeta {
+  border: 1px solid var(--borde);
+  border-left: 3px solid var(--c-neutro);
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: var(--fondo);
+  cursor: pointer;
+  transition: border-color .12s, transform .08s;
+}
+.tarjeta:hover { border-color: var(--borde-fuerte); }
+.tarjeta.activa { border-color: var(--acento); background: var(--acento-suave); }
+
+.tarjeta h3 { margin: 0 0 3px; font-size: 14.5px; font-weight: 650; line-height: 1.35; }
+.tarjeta .meta { font-size: 11px; color: var(--texto-tenue); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 7px; }
+.tarjeta .resumen { margin: 0 0 8px; font-size: 13.5px; }
+.tarjeta .formula {
+  font-family: var(--fuente-han);
+  font-size: 12.5px;
+  background: var(--fondo-hundido);
+  border-radius: 6px;
+  padding: 5px 8px;
+  margin-bottom: 8px;
+  color: var(--texto-suave);
+}
+.tarjeta .detalle, .tarjeta .contraste { margin: 0 0 8px; font-size: 13px; color: var(--texto-suave); line-height: 1.6; }
+.tarjeta .contraste { border-left: 2px solid var(--borde-fuerte); padding-left: 9px; }
+.tarjeta .contraste::before { content: "Frente al español — "; font-weight: 600; color: var(--texto); }
+.tarjeta .ejemplo { font-size: 13px; background: var(--fondo-hundido); border-radius: 6px; padding: 7px 9px; }
+.tarjeta .ejemplo .zh { font-family: var(--fuente-han); font-size: 16px; }
+.tarjeta .ejemplo .py { display: block; }
+.tarjeta .ejemplo .es { color: var(--texto-suave); }
+.tarjeta .cuerpo { display: none; }
+.tarjeta.abierta .cuerpo { display: block; }
+
+.nivel-1 { border-left-color: var(--c-objeto); }
+.nivel-2 { border-left-color: var(--c-circunstancia); }
+.nivel-3 { border-left-color: var(--c-verbo); }
+
+.vacio { color: var(--texto-tenue); font-size: 13.5px; padding: 8px 0; }
+
+/* ------------------------------- ficha --------------------------------- */
+
+.ficha {
+  position: absolute;
+  z-index: 60;
+  max-width: 300px;
+  background: var(--fondo-panel);
+  border: 1px solid var(--borde-fuerte);
+  border-radius: 10px;
+  box-shadow: var(--sombra);
+  padding: 11px 13px;
+  font-size: 13px;
+  pointer-events: none;
+}
+.ficha .f-han { font-family: var(--fuente-han); font-size: 24px; line-height: 1.2; }
+.ficha .f-py { color: var(--acento); font-size: 14px; margin-bottom: 6px; }
+.ficha .f-cat { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--texto-tenue); }
+.ficha .f-es { margin: 5px 0; }
+.ficha .f-en { color: var(--texto-suave); font-size: 12px; font-style: italic; }
+.ficha .f-extra { margin-top: 7px; padding-top: 7px; border-top: 1px solid var(--borde); font-size: 12px; color: var(--texto-suave); }
+.ficha .etiqueta-hsk {
+  display: inline-block; background: var(--acento-suave); color: var(--acento);
+  border-radius: 4px; padding: 1px 5px; font-size: 11px; font-weight: 600; margin-left: 6px;
+}
+
+/* ------------------------------- modal --------------------------------- */
+
+.modal {
+  position: fixed; inset: 0; z-index: 80;
+  background: rgba(20, 18, 14, .45);
+  display: grid; place-items: center;
+  padding: 20px;
+}
+.modal-caja {
+  background: var(--fondo-panel);
+  border-radius: 14px;
+  box-shadow: var(--sombra);
+  max-width: 620px; width: 100%;
+  max-height: 85vh; overflow-y: auto;
+  padding: 24px 26px;
+  position: relative;
+}
+.modal-cerrar {
+  position: absolute; top: 12px; right: 14px;
+  border: 0; background: transparent; cursor: pointer;
+  font-size: 24px; line-height: 1; color: var(--texto-tenue);
+}
+.modal-caja h2 { margin-top: 0; font-size: 19px; }
+.modal-caja h3 { font-size: 14px; margin: 18px 0 6px; }
+.modal-caja p, .modal-caja li { font-size: 14px; line-height: 1.6; color: var(--texto-suave); }
+.modal-caja code { background: var(--fondo-hundido); padding: 1px 5px; border-radius: 4px; font-size: 13px; }
+
+.lista-ejemplos { display: grid; gap: 8px; }
+.ejemplo-boton {
+  text-align: left; font: inherit; cursor: pointer;
+  background: var(--fondo); border: 1px solid var(--borde);
+  border-radius: 9px; padding: 10px 12px; color: var(--texto);
+}
+.ejemplo-boton:hover { border-color: var(--acento); }
+.ejemplo-boton .e-zh { font-family: var(--fuente-han); font-size: 17px; display: block; }
+.ejemplo-boton .e-nota { font-size: 12px; color: var(--texto-suave); }
+
+/* --------------------------------- pie --------------------------------- */
+
+.pie {
+  padding: 16px 20px 28px;
+  font-size: 11.5px;
+  color: var(--texto-tenue);
+  text-align: center;
+}
+.separador { margin: 0 6px; }
+
+/* ------------------------------ responsive ----------------------------- */
+
+@media (max-width: 900px) {
+  .paneles { grid-template-columns: 1fr; }
+  main { padding: 14px; }
+  .han { font-size: 22px; }
+  .tarjetas { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .cabecera { padding: 10px 14px; }
+  .lema { display: none; }
+  .entrada { font-size: 18px; }
+}
