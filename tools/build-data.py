@@ -194,6 +194,10 @@ def build():
         w = e['s']
         if not w or not HANZI.search(w):
             continue
+        # Unas pocas entradas del paquete vienen con caracteres rotos
+        # (U+FFFD). No sirven de nada y ensucian el fichero generado.
+        if '\ufffd' in w or '\ufffd' in ' '.join(e.get('en') or []):
+            continue
         if NUM_CL.match(w) or es_negacion_transparente(w) or es_verbo_mas_aspecto(w):
             continue
         py = e.get('py', '')

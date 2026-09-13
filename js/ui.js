@@ -350,9 +350,30 @@
 
   /* -------------------------- traducción con IA ------------------------- */
 
+  /* Cuando la página corre publicada, Claude está a mano y no hace falta clave;
+   * si no, se usa la API con la clave que ponga el usuario. */
+  var sampleClaude = null;
+
   function traducirConIa() {
-    var clave = el.claveApi.value.trim();
     var boton = $('#btn-traducir-ia');
+    if (sampleClaude) {
+      if (!textoActual.trim()) return;
+      boton.disabled = true;
+      el.salidaIa.textContent = '';
+      el.salidaIa.appendChild(crear('p', 'vacio', 'Traduciendo…'));
+      window.Traduccion.conClaude(textoActual, sampleClaude)
+        .then(pintarResultadoIa)
+        .catch(function (err) {
+          el.salidaIa.textContent = '';
+          el.salidaIa.appendChild(crear('div', 'error',
+            err && err.code === 'not_granted'
+              ? 'Para usar esta traducción hay que dar permiso cuando el navegador lo pida.'
+              : 'No se ha podido traducir. ' + ((err && err.message) || '')));
+        })
+        .then(function () { boton.disabled = false; });
+      return;
+    }
+    var clave = el.claveApi.value.trim();
     if (!clave) {
       el.salidaIa.textContent = '';
       el.salidaIa.appendChild(crear('div', 'error', 'Hace falta una clave de la API de Claude. Se consigue en console.anthropic.com y se guarda sólo en este navegador.'));
@@ -365,7 +386,13 @@
     el.salidaIa.textContent = '';
     el.salidaIa.appendChild(crear('p', 'vacio', 'Traduciendo…'));
 
-    window.Traduccion.conIA(textoActual, clave).then(function (res) {
+    window.Traduccion.conIA(textoActual, clave).then(pintarResultadoIa).catch(function (err) {
+      el.salidaIa.textContent = '';
+      el.salidaIa.appendChild(crear('div', 'error', 'No se ha podido traducir. ' + err.message));
+    }).then(function () { boton.disabled = false; });
+  }
+
+  function pintarResultadoIa(res) {
       el.salidaIa.textContent = '';
       var alineados = window.Traduccion.alinear(textoActual, res.segmentos);
 
@@ -396,10 +423,6 @@
         caja.appendChild(ul);
         el.salidaIa.appendChild(caja);
       }
-    }).catch(function (err) {
-      el.salidaIa.textContent = '';
-      el.salidaIa.appendChild(crear('div', 'error', 'No se ha podido traducir. ' + err.message));
-    }).then(function () { boton.disabled = false; });
   }
 
   /* -------------------------------- modales ----------------------------- */
@@ -577,6 +600,25 @@
     analizar();
 
     el.estadoDicc.textContent = window.Lexico.tamano().toLocaleString('es-ES') + ' palabras cargadas';
+
+    // Si la página corre publicada, Claude está disponible sin clave de API.
+    window.Traduccion.disponibleSinClave().then(function (sample) {
+      if (!sample) return;
+      sampleClaude = sample;
+      $('.fila-clave').classList.add('oculta');
+      var aviso = $('#vista-ia .aviso-vista');
+      if (aviso) {
+        aviso.textContent = 'Traducción natural hecha por Claude. No hace falta ninguna clave: ' +
+          'el navegador pedirá permiso la primera vez.';
+      }
+      var caja = crear('div', 'fila-clave');
+      var b = crear('button', 'boton', 'Traducir con Claude');
+      b.type = 'button';
+      b.id = 'btn-claude';
+      b.addEventListener('click', traducirConIa);
+      caja.appendChild(b);
+      $('#vista-ia').insertBefore(caja, el.salidaIa);
+    });
 
     // El resto del diccionario llega después y el análisis se repite solo.
     window.Lexico.cargarAmpliacion().then(function (n) {

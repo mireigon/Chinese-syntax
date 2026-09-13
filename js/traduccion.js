@@ -461,6 +461,39 @@ window.Traduccion = (function () {
       '(partículas, clasificadores).';
   }
 
+  function interpretar(salida) {
+    var limpio = (salida || '').trim().replace(/^```(?:json)?/, '').replace(/```$/, '').trim();
+    var json;
+    try { json = JSON.parse(limpio); }
+    catch (e) { return { traduccion: (salida || '').trim(), segmentos: [], notas: [] }; }
+    return {
+      traduccion: json.traduccion || '',
+      segmentos: Array.isArray(json.segmentos) ? json.segmentos : [],
+      notas: Array.isArray(json.notas) ? json.notas : []
+    };
+  }
+
+  /* Cuando la página está publicada como Artifact, Claude se puede consultar
+   * directamente, sin clave de API: la pide el propio visor. */
+  function disponibleSinClave() {
+    if (!window.claude || typeof window.claude.use !== 'function') return Promise.resolve(null);
+    return window.claude.use('sample').then(function (s) { return s || null; })
+      .catch(function () { return null; });
+  }
+
+  function conClaude(texto, sample) {
+    return sample.json(instrucciones(texto), { modelTier: 'default' }).then(function (json) {
+      if (json && typeof json === 'object' && !Array.isArray(json)) {
+        return {
+          traduccion: json.traduccion || '',
+          segmentos: Array.isArray(json.segmentos) ? json.segmentos : [],
+          notas: Array.isArray(json.notas) ? json.notas : []
+        };
+      }
+      return { traduccion: '', segmentos: [], notas: [] };
+    });
+  }
+
   /** Pide la traducción natural a la API de Claude. Devuelve una promesa. */
   function conIA(texto, clave, opciones) {
     opciones = opciones || {};
@@ -486,16 +519,7 @@ window.Traduccion = (function () {
       }
       return res.json();
     }).then(function (datos) {
-      var salida = (datos.content || []).map(function (c) { return c.text || ''; }).join('');
-      var limpio = salida.trim().replace(/^```(?:json)?/, '').replace(/```$/, '').trim();
-      var json;
-      try { json = JSON.parse(limpio); }
-      catch (e) { return { traduccion: salida.trim(), segmentos: [], notas: [] }; }
-      return {
-        traduccion: json.traduccion || '',
-        segmentos: Array.isArray(json.segmentos) ? json.segmentos : [],
-        notas: Array.isArray(json.notas) ? json.notas : []
-      };
+      return interpretar((datos.content || []).map(function (c) { return c.text || ''; }).join(''));
     });
   }
 
@@ -519,6 +543,8 @@ window.Traduccion = (function () {
     literal: literal,
     traducirClausula: traducirClausula,
     conIA: conIA,
+    conClaude: conClaude,
+    disponibleSinClave: disponibleSinClave,
     alinear: alinear,
     MODELO: MODELO
   };

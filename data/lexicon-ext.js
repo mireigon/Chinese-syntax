@@ -17873,7 +17873,6 @@ word姐	w o r d jiě		0	0	my big sister (Internet slang version of 我的姐)
 古鲁孙	gǔ lǔ sūn	nr	22	0	
 古鲁鲁	gǔ lǔ lǔ		0	0	(onom.) the sound of a rolling object
 古龙	gǔ lóng	nr	18	0	Gu Long (1938-1985), Taiwanese wuxia novelist and screenwriter
-古��诗	gǔ tǐ shī		0	0	a pre-Tang Dynasty genre of poetry, relatively free in form, usually having four, five, six or seven characters per line
 句句实话	jù jù shí huà	v	7	0	to speak honestly (idiom)
 句容	jù róng	n	18	0	Jurong county level city in Zhenjiang 鎮江|镇江, Jiangsu
 句容市	jù róng shì	n	7	0	Jurong county level city in Zhenjiang 鎮江|镇江, Jiangsu
@@ -18162,7 +18161,6 @@ word姐	w o r d jiě		0	0	my big sister (Internet slang version of 我的姐)
 台湾民主自治同盟	tái wān mín zhǔ zì zhì tóng méng	nt	18	0	Taiwan Democratic Self-Government League
 台湾画眉	tái wān huà méi		0	0	(bird species of China) Taiwan hwamei (Garrulax taewanus)
 台湾白喉噪鹛	tái wān bái hóu zào méi		0	0	(bird species of China) rufous-crowned laughingthrush (Garrulax ruficeps)
-台湾短翅���	tái wān duǎn chì yīng		0	0	(bird species of China) Taiwan bush warbler (Locustella alishanensis)
 台湾紫啸鸫	tái wān zǐ xiào dōng		0	0	(bird species of China) Taiwan whistling thrush (Myophonus insularis)
 台湾蓝鹊	tái wān lán què		0	0	(bird species of China) Taiwan blue magpie (Urocissa caerulea)
 台湾话	tái wān huà		0	0	Taiwanese Chinese (language)
@@ -45463,7 +45461,6 @@ word姐	w o r d jiě		0	0	my big sister (Internet slang version of 我的姐)
 杀鸡给猴看	shā jī gěi hóu kàn		0	0	lit. to kill a chicken in front of a monkey; fig. to make an example of sb (by punishment) to frighten others
 杀鸡警猴	shā jī jǐng hóu		0	0	lit. killing the chicken to warn the monkey (idiom); to punish an individual as an example to others; pour encourager les autres
 杀鼠药	shā shǔ yào	i	7	0	rat poison
-杀���案	shā rén àn		0	0	murder case; homicide case
 杂七杂八	zá qī zá bā	i	23	0	an assortment; a bit of everything; lots of different (skills)
 杂交植物	zá jiāo zhí wù		0	0	hybrid plant
 杂交派对	zá jiāo pài duì		0	0	sex party; orgy
@@ -45948,7 +45945,6 @@ word姐	w o r d jiě		0	0	my big sister (Internet slang version of 我的姐)
 来稿	lái gǎo	v	24	0	
 来者不善，善者不来	lái zhě bù shàn , shàn zhě bù lái		0	0	He who comes is surely ill-intentioned, no-one well-meaning will come (idiom).; Be careful not to trust foreigners.; Beware of Greeks bearing gifts!
 来者不拒	lái zhě bù jù	i	20	0	
-来者��拒	lái zhě bù jù		0	0	to refuse nobody (idiom); all comers welcome
 来而不往非礼也	lái ér bù wǎng fēi lǐ yě	i	19	0	not to reciprocate is against etiquette (classical); to respond in kind
 来苏糖	lái sū táng	nr	7	0	lyxose (type of sugar)
 来袭	lái xí		0	0	to invade; (of a storm etc) to strike; to hit
@@ -82093,7 +82089,6 @@ word姐	w o r d jiě		0	0	my big sister (Internet slang version of 我的姐)
 金秀才	jīn xiù cái	nr	19	0	
 金秀瑶族自治县	jīn xiù yáo zú zì zhì xiàn	ns	11	0	Jinxiu Yao autonomous county in Laibin 來賓|来宾, Guangxi
 金科玉律	jīn kē yù lǜ	nr	18	0	golden rule; key principle
-金窝银窝不如��己的狗窝	jīn wō yín wō bù rú zì jǐ de gǒu wō		0	0	there's no place like home (idiom)
 金章宗	jīn zhāng zōng	nr	20	0	
 金童玉女	jīn tóng yù nǚ	nr	18	0	lit. golden boys and jade maidens (idiom); attendants of the Daoist immortals; fig. lovely young children
 金箍	jīn gū	nz	7	0	gold band
@@ -90309,9 +90304,6 @@ word姐	w o r d jiě		0	0	my big sister (Internet slang version of 我的姐)
 龟苓膏	guī líng gāo	n	7	0	turtle jelly, medicine made with powdered turtle shell and herbs; a similar product made without turtle shell and consumed as a dessert
 龟裂	jūn liè	v	21	0	to crack; cracked; fissured
 龟趺	guī fū		0	0	pedestal in the form of a tortoise
-��价器	jì jià qì		0	0	fare meter; taximeter
-���数	xī shǔ		0	0	to enumerate in detail; to explain clearly; all
-���械工人	jī xiè gōng rén		0	0	mechanic
 𕆧息	shùn xī		0	0	in a flash; twinkling; ephemeral
 𕻗子	chá zi		0	0	(dialect) coarsely ground maize; corn grit
 𕻗粥	chá zhōu		0	0	gruel made from ground maize; corn grit congee
