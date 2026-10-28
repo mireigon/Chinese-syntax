@@ -10,6 +10,63 @@ un mensaje, la etiqueta de un bote. No hace falta instalar nada ni conectarse a
 ningún servidor: es HTML, CSS y JavaScript sin dependencias, y el diccionario
 viaja dentro de la propia página.
 
+## En una tableta (Android, tinta electrónica)
+
+Hay dos maneras, y las dos funcionan **sin conexión** con el diccionario entero
+dentro del dispositivo.
+
+### APK
+
+`android/leer-chino.apk` se copia a la tableta y se instala (hay que permitir
+«instalar apps de orígenes desconocidos» para el gestor de archivos). Pesa unos
+9 MB, pide Android 5 o posterior y sólo usa el permiso de internet, que
+únicamente hace falta para la traducción con IA.
+
+Es un envoltorio de la aplicación web: un WebView a pantalla completa con todos
+los ficheros dentro del propio APK. La ventaja sobre el navegador es que la
+tableta lo trata como una aplicación más, así que en un Boox se le puede fijar
+su propio **modo de refresco** desde los ajustes por aplicación.
+
+El **modo tinta electrónica viene encendido** de serie en el APK.
+
+### Instalarla desde el navegador
+
+La página es también una aplicación instalable. Al abrirla en Chrome en la
+tableta, el menú ofrece «Instalar aplicación» o «Añadir a la pantalla de
+inicio»; a partir de ahí se abre sin barra de navegador y funciona sin
+conexión. La primera visita descarga y guarda los 9 MB de diccionario; las
+siguientes ya no descargan nada.
+
+### Qué cambia en el modo tinta electrónica
+
+El botón **Tinta** de la cabecera lo enciende y lo apaga, y recuerda la
+elección. Una pantalla de tinta electrónica no es una pantalla normal:
+
+- **Nada se mueve.** Fuera transiciones, animaciones y sombras. El resaltado
+  marca lo seleccionado en lugar de atenuar todo lo demás, que obligaría a
+  repintar media pantalla. La cabecera deja de ir pegada arriba.
+- **Contraste al máximo**, negro sobre blanco, y el modo oscuro se desactiva.
+- **Los papeles se distinguen por la forma del subrayado**, no sólo por el
+  color: continuo para el sujeto, doble para el verbo, a rayas para el objeto,
+  de puntos para las circunstancias y ondulado para los coverbos. En el Kaleido
+  3 de un Note Air el color sale muy lavado, y en blanco y negro desaparece;
+  la forma sobrevive a las dos cosas.
+- **Letra y zonas de toque más grandes**, para el dedo y para el lápiz.
+
+### Construir el APK
+
+```sh
+sudo apt install aapt zipalign apksigner default-jdk
+android/construir.sh
+```
+
+No hace falta el SDK de Android ni Android Studio. El script se baja de Maven
+Central las dos piezas que faltan —los stubs de `android.jar` para compilar y
+`dx` para convertir el bytecode a dex— y usa `aapt`, `zipalign` y `apksigner`
+del archivo de Ubuntu. Firma con una llave de depuración en
+`android/llave-depuracion.jks`; conviene conservarla, porque si cambia hay que
+desinstalar antes de volver a instalar.
+
 ## Cómo se abre
 
 ```sh
@@ -29,11 +86,13 @@ Pages o a cualquier alojamiento estático.
 ## Qué se ve en pantalla
 
 **Panel izquierdo — el chino.** El texto queda partido en palabras, cada una con
-su pinyin encima. Debajo de cada palabra hay un subrayado de color que dice qué
-papel cumple en la frase: sujeto, verbo, objeto, circunstancia, coverbo,
-partícula de aspecto… Al pasar el ratón por una palabra aparece su ficha:
-pronunciación, categoría, significado, nivel HSK y, si la tiene, la lectura
-alternativa o el cambio de tono al pronunciarla.
+su pinyin encima. Debajo de cada palabra hay un subrayado que dice qué papel
+cumple en la frase: sujeto, verbo, objeto, circunstancia, coverbo, partícula de
+aspecto… Al tocar una palabra (o pasar el ratón por encima) su ficha aparece
+justo debajo del texto, siempre en el mismo sitio: pronunciación, categoría,
+significado, nivel HSK y, si la tiene, la lectura alternativa o el cambio de
+tono al pronunciarla. Desde la ficha se salta a las construcciones que
+afectan a esa palabra.
 
 **Panel derecho — el pinyin y el español.** Arriba, la lectura corrida. Debajo,
 dos traducciones:
@@ -54,9 +113,9 @@ escrita con las palabras concretas de tu frase, la comparación con lo que harí
 el español y un ejemplo canónico. Al pinchar una tarjeta se resalta en los dos
 paneles la parte de la frase a la que se refiere.
 
-Todo lo que se enciende a la vez está enlazado: pasar el ratón por una palabra
-china enciende su pinyin y su traducción; pasarlo por la traducción enciende el
-chino del que salió.
+Todo lo que se enciende a la vez está enlazado: tocar una palabra china enciende
+su pinyin y su traducción; tocar la traducción enciende el chino del que salió.
+Tocar otra vez suelta la selección.
 
 ## Qué reconoce
 
@@ -98,7 +157,10 @@ js/construcciones*.js las cincuenta construcciones, con sus explicaciones
 js/analisis.js        oraciones, cláusulas y papeles sintácticos
 js/traduccion.js      traducción estructural alineada y puente con la API
 js/ejemplos.js        textos de muestra
-js/ui.js              interfaz y resaltado cruzado
+js/ui.js              interfaz, resaltado cruzado y modo tinta electrónica
+sw.js                 service worker: deja la aplicación instalada y sin conexión
+manifest.webmanifest  metadatos para instalarla como aplicación
+android/              envoltorio WebView y su script de construcción
 data/*.js             diccionario generado (se versiona, no hay que construirlo)
 tools/                el pipeline que genera data/, y el glosario español a mano
 tests/motor.js        banco de pruebas del motor, sin navegador
@@ -185,6 +247,15 @@ Conviene saber dónde falla, porque falla:
   marca en cursiva con la coletilla «(en inglés)».
 - El pinyin de las palabras que no están en CC-CEDICT se compone carácter a
   carácter y puede fallar en los polifónicos.
+- El APK se ha verificado a fondo (firma, manifiesto, dex, y los assets
+  cargados sobre `file://` en Chromium, que es el mismo motor del WebView de
+  Android), pero **no se ha podido instalar en un dispositivo real** durante su
+  construcción.
+- Dentro del APK, la pestaña de traducción con IA puede fallar: al cargarse
+  desde `file://` el navegador manda un origen nulo y la API puede rechazarlo.
+  Para esa función concreta es más fiable abrir la versión web. Todo lo demás
+  —análisis, pinyin, diccionario y traducción estructural— funciona sin
+  conexión en las dos.
 
 ## Procedencia de los datos
 

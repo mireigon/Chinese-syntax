@@ -11,6 +11,10 @@
   var analisisActual = null;
   var textoActual = '';
   var marcaSeleccionada = null;
+  var tokenFijado = null;
+  // En una tableta no hay puntero fino ni «hover»: toda la interacción es tocar.
+  var hayRaton = window.matchMedia &&
+    window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
   var el = {
     entrada: $('#entrada'),
@@ -21,7 +25,7 @@
     gramatica: $('#salida-gramatica'),
     leyenda: $('#leyenda'),
     contador: $('#contador'),
-    ficha: $('#ficha'),
+    detalle: $('#detalle'),
     modal: $('#modal'),
     modalContenido: $('#modal-contenido'),
     estadoDicc: $('#estado-dicc'),
@@ -105,8 +109,11 @@
       if (!info) return;
       var s = crear('span', '');
       s.title = info.ayuda;
-      var i = crear('i', '');
-      i.style.background = 'var(--c-' + info.color + ')';
+      // La clase deja que el modo tinta dibuje también la FORMA del subrayado.
+      // Sólo se fija el color: el testigo lo usa como fondo en pantalla normal
+      // y como color del trazo en modo tinta, donde la FORMA también importa.
+      var i = crear('i', 'l-' + papel);
+      i.style.color = 'var(--c-' + info.color + ')';
       s.appendChild(i);
       s.appendChild(document.createTextNode(info.nombre));
       el.leyenda.appendChild(s);
@@ -249,7 +256,6 @@
   /* ------------------------------ resaltado ----------------------------- */
 
   function limpiarResaltado() {
-    document.body.classList.remove('enfocando');
     Array.prototype.forEach.call(document.querySelectorAll('.activa'), function (n) {
       if (!n.classList.contains('pestana')) n.classList.remove('activa');
     });
@@ -261,7 +267,6 @@
     if (!indices || !indices.length) return;
     var conjunto = {};
     indices.forEach(function (i) { conjunto[i] = true; });
-    document.body.classList.add('enfocando');
 
     Array.prototype.forEach.call(document.querySelectorAll('[data-tok]'), function (n) {
       if (conjunto[+n.dataset.tok]) n.classList.add('activa');
@@ -279,23 +284,36 @@
     resaltarTokens(m.tokens.map(function (t) { return t.i; }));
     var tarjeta = document.querySelector('.tarjeta[data-marca="' + idMarca + '"]');
     if (tarjeta) tarjeta.classList.add('activa');
+    pintarDetalleMarca(m);
   }
 
-  /* -------------------------- ficha de la palabra ----------------------- */
+  /* --------------------- detalle de la palabra tocada -------------------- */
 
-  function mostrarFicha(tk, elemento) {
-    var f = el.ficha;
+  /* La ficha no flota: vive en un sitio fijo bajo el texto y se reescribe
+   * cuando tocas otra palabra. Así no tapa lo que estás leyendo y, en tinta
+   * electrónica, sólo se repinta ese recuadro. */
+
+  function pintarDetalleVacio() {
+    el.detalle.textContent = '';
+    el.detalle.classList.add('detalle-vacio');
+    el.detalle.appendChild(crear('p', '', hayRaton
+      ? 'Pon el cursor sobre una palabra (o tócala) para ver su pronunciación, su significado y su función en la frase.'
+      : 'Toca una palabra para ver su pronunciación, su significado y su función en la frase.'));
+  }
+
+  function pintarDetalle(tk) {
+    var f = el.detalle;
     f.textContent = '';
+    f.classList.remove('detalle-vacio');
 
-    var cab = crear('div', '');
+    var cab = crear('div', 'd-cabecera');
     cab.appendChild(crear('span', 'f-han', tk.texto));
-    if (tk.hsk) {
-      var h = crear('span', 'etiqueta-hsk', 'HSK ' + tk.hsk);
-      cab.appendChild(h);
-    }
+    var bloque = crear('div', 'd-identidad');
+    if (tk.py) bloque.appendChild(crear('div', 'f-py', tk.py));
+    if (tk.categoria) bloque.appendChild(crear('div', 'f-cat', tk.categoria));
+    cab.appendChild(bloque);
+    if (tk.hsk) cab.appendChild(crear('span', 'etiqueta-hsk', 'HSK ' + tk.hsk));
     f.appendChild(cab);
-    if (tk.py) f.appendChild(crear('div', 'f-py', tk.py));
-    if (tk.categoria) f.appendChild(crear('div', 'f-cat', tk.categoria));
 
     var gl = window.Glosa.de(tk);
     if (gl.origen === 'glosario' || gl.origen === 'compuesta' || gl.origen === 'reduplicada') {
@@ -314,19 +332,63 @@
     if (tk.sandhi) extras.push('Se pronuncia «' + tk.sandhi.dicho + '»: ' + tk.sandhi.motivo);
     if (extras.length) f.appendChild(crear('div', 'f-extra', extras.join(' ')));
 
-    f.classList.remove('oculta');
-    var r = elemento.getBoundingClientRect();
-    var ancho = f.offsetWidth;
-    var izq = Math.min(window.innerWidth - ancho - 12, Math.max(8, r.left + r.width / 2 - ancho / 2));
-    var arriba = r.bottom + window.scrollY + 8;
-    if (r.bottom + f.offsetHeight + 20 > window.innerHeight) {
-      arriba = r.top + window.scrollY - f.offsetHeight - 8;
+    // Construcciones que tocan esta palabra: se puede saltar a su explicación.
+    if (tk.marcas && tk.marcas.length && analisisActual) {
+      var fila = crear('div', 'd-marcas');
+      tk.marcas.forEach(function (id) {
+        var m = analisisActual.marcas.filter(function (x) { return x.id === id; })[0];
+        if (!m) return;
+        var b = crear('button', 'chip', m.titulo);
+        b.type = 'button';
+        b.addEventListener('click', function (ev) {
+          ev.stopPropagation();
+          abrirTarjeta(id);
+        });
+        fila.appendChild(b);
+      });
+      if (fila.childNodes.length) f.appendChild(fila);
     }
-    f.style.left = izq + 'px';
-    f.style.top = Math.max(8, arriba) + 'px';
   }
 
-  function ocultarFicha() { el.ficha.classList.add('oculta'); }
+  function pintarDetalleMarca(m) {
+    var f = el.detalle;
+    f.textContent = '';
+    f.classList.remove('detalle-vacio');
+    f.appendChild(crear('div', 'd-titulo', m.titulo));
+    f.appendChild(crear('div', 'f-es', m.resumen));
+    f.appendChild(crear('div', 'f-extra',
+      'Resaltado en los dos paneles: ' +
+      m.tokens.map(function (x) { return x.texto; }).join('') + '.'));
+  }
+
+  function seleccionarToken(indice, fijar) {
+    if (!analisisActual) return;
+    var tk = analisisActual.tokens[indice];
+    if (!tk) return;
+    if (fijar) { tokenFijado = indice; marcaSeleccionada = null; }
+    resaltarTokens([indice]);
+    pintarDetalle(tk);
+  }
+
+  function soltarSeleccion() {
+    tokenFijado = null;
+    marcaSeleccionada = null;
+    limpiarResaltado();
+    pintarDetalleVacio();
+  }
+
+  function abrirTarjeta(id) {
+    var tarjeta = document.querySelector('.tarjeta[data-marca="' + id + '"]');
+    if (!tarjeta) return;
+    Array.prototype.forEach.call(el.gramatica.querySelectorAll('.tarjeta'), function (t) {
+      t.classList.remove('abierta');
+    });
+    tarjeta.classList.add('abierta');
+    marcaSeleccionada = id;
+    tokenFijado = null;
+    resaltarMarca(id);
+    tarjeta.scrollIntoView({ block: 'nearest' });
+  }
 
   /* ------------------------------- análisis ----------------------------- */
 
@@ -337,12 +399,14 @@
 
     analisisActual = window.Analisis.analizar(texto);
     marcaSeleccionada = null;
+    tokenFijado = null;
     pintarChino(analisisActual);
     pintarPinyin(analisisActual);
     pintarEspanol(analisisActual);
     pintarGramatica(analisisActual);
     pintarLeyenda(analisisActual);
     limpiarResaltado();
+    pintarDetalleVacio();
     guardar('texto', texto);
   }
 
@@ -463,10 +527,19 @@
 
       '<h3>Los dos paneles</h3>',
       '<p>A la izquierda ves el texto partido en palabras, con el pinyin encima de cada una. ',
-      'A la derecha, la traducción. En los dos lados, el <strong>color del subrayado</strong> indica ',
-      'qué papel cumple cada trozo en la frase. Al pasar el cursor por una palabra se enciende ',
-      'también su equivalente en el otro panel: así se ve de un vistazo cómo se reordena el chino ',
-      'al pasarlo al español.</p>',
+      'A la derecha, la traducción. En los dos lados, el <strong>subrayado</strong> indica qué papel ',
+      'cumple cada trozo en la frase. <strong>Toca una palabra</strong> (o pasa el cursor, si usas ',
+      'ratón) y se enciende también su equivalente en el otro panel: así se ve de un vistazo cómo ',
+      'se reordena el chino al pasarlo al español. Debajo del texto aparece su ficha, y desde ahí ',
+      'puedes saltar a la construcción gramatical que la afecta. Toca otra vez para soltarla.</p>',
+
+      '<h3>En una tableta de tinta electrónica</h3>',
+      '<p>El botón <strong>Tinta</strong> de arriba cambia a un modo pensado para lectores de tinta ',
+      'electrónica: sin animaciones ni atenuados (que es lo que deja fantasmas en pantalla), ',
+      'contraste al máximo, letra y zonas de toque más grandes, y la cabecera deja de ir pegada ',
+      'arriba. Además, cada papel sintáctico pasa a tener una <strong>forma de subrayado</strong> ',
+      'propia —continuo, doble, a rayas, de puntos, ondulado— para que se distingan aunque la ',
+      'pantalla esté en blanco y negro o descolore el color.</p>',
 
       '<h3>Las dos traducciones</h3>',
       '<p><strong>Estructural</strong> es la que hace este programa por su cuenta: sustituye cada bloque ',
@@ -498,8 +571,39 @@
 
   /* ------------------------------- arranque ----------------------------- */
 
+  /* -------------------------- tinta electrónica ------------------------- */
+
+  /* En una pantalla de tinta electrónica cada cambio en pantalla cuesta un
+   * repintado y deja fantasmas. Este modo quita animaciones y atenuados, sube
+   * el contraste al máximo y distingue los papeles por el ESTILO del subrayado
+   * además de por el color, porque el color de un Kaleido 3 sale muy lavado. */
+  function aplicarTinta(activo) {
+    document.body.classList.toggle('tinta', !!activo);
+    var b = $('#btn-tinta');
+    if (b) {
+      b.setAttribute('aria-pressed', activo ? 'true' : 'false');
+      b.classList.toggle('activo', !!activo);
+    }
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', activo ? '#ffffff' : '#faf8f5');
+    guardar('tinta', activo ? '1' : '0');
+  }
+
+  function tintaInicial() {
+    // El envoltorio de Android lo enciende de entrada; si no, manda lo que el
+    // usuario eligiera la última vez.
+    var guardada = leer('tinta');
+    if (guardada !== null) return guardada === '1';
+    if (window.LEERCHINO_TINTA) return true;
+    return /[?&]tinta=1/.test(location.search);
+  }
+
   function conectarEventos() {
     el.entrada.addEventListener('input', analizarPronto);
+
+    $('#btn-tinta').addEventListener('click', function () {
+      aplicarTinta(!document.body.classList.contains('tinta'));
+    });
 
     ['#op-pinyin', '#op-glosa'].forEach(function (sel) {
       $(sel).addEventListener('change', function () { if (analisisActual) pintarChino(analisisActual); });
@@ -520,7 +624,7 @@
     $('#modal-cerrar').addEventListener('click', cerrarModal);
     el.modal.addEventListener('click', function (e) { if (e.target === el.modal) cerrarModal(); });
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') { cerrarModal(); limpiarResaltado(); ocultarFicha(); }
+      if (e.key === 'Escape') { cerrarModal(); soltarSeleccion(); }
     });
 
     // pestañas del panel español
@@ -536,33 +640,51 @@
     });
     $('#btn-traducir-ia').addEventListener('click', traducirConIa);
 
-    // resaltado cruzado entre paneles
-    document.addEventListener('mouseover', function (e) {
-      var pal = e.target.closest ? e.target.closest('[data-tok]') : null;
-      if (pal && analisisActual) {
-        var tk = analisisActual.tokens[+pal.dataset.tok];
-        if (!tk) return;
-        if (!marcaSeleccionada) resaltarTokens([tk.i]);
-        if (tk.tipo === 'hanzi') mostrarFicha(tk, pal);
+    // Resaltado cruzado. Tocar fija la selección; en un ordenador, además, el
+    // cursor la previsualiza mientras no haya nada fijado.
+    function tokenDelEvento(destino) {
+      if (!destino || !destino.closest) return -1;
+      var pal = destino.closest('[data-tok]');
+      if (pal) return +pal.dataset.tok;
+      var seg = destino.closest('[data-toks]');
+      if (seg) {
+        var lista = (seg.dataset.toks || '').split(',').filter(Boolean);
+        if (lista.length) return +lista[0];
+      }
+      return -1;
+    }
+
+    document.addEventListener('click', function (e) {
+      if (e.target.closest && e.target.closest('.detalle')) return;
+      var i = tokenDelEvento(e.target);
+      if (i >= 0) {
+        if (tokenFijado === i) soltarSeleccion();
+        else seleccionarToken(i, true);
         return;
       }
-      var seg = e.target.closest ? e.target.closest('[data-toks]') : null;
-      if (seg && !marcaSeleccionada) {
-        resaltarTokens((seg.dataset.toks || '').split(',').filter(Boolean).map(Number));
-      }
+      // Tocar fuera de los paneles suelta lo que hubiera seleccionado.
+      if (e.target.closest &&
+          (e.target.closest('.salida') || e.target.closest('.tarjeta') ||
+           e.target.closest('.cabecera') || e.target.closest('.modal'))) return;
+      if (tokenFijado !== null || marcaSeleccionada) soltarSeleccion();
     });
-    document.addEventListener('mouseout', function (e) {
-      if (e.target.closest && e.target.closest('[data-tok]')) ocultarFicha();
-    });
-    el.salidaZh.addEventListener('mouseleave', function () {
-      if (!marcaSeleccionada) limpiarResaltado();
-      ocultarFicha();
-    });
-    [el.salidaEs, el.salidaPy].forEach(function (n) {
-      n.addEventListener('mouseleave', function () {
-        if (!marcaSeleccionada) limpiarResaltado();
+
+    if (hayRaton) {
+      document.addEventListener('mouseover', function (e) {
+        if (tokenFijado !== null || marcaSeleccionada) return;
+        var i = tokenDelEvento(e.target);
+        if (i >= 0) seleccionarToken(i, false);
       });
-    });
+      [el.salidaZh, el.salidaEs, el.salidaPy].forEach(function (n) {
+        if (!n) return;
+        n.addEventListener('mouseleave', function () {
+          if (tokenFijado === null && !marcaSeleccionada) {
+            limpiarResaltado();
+            pintarDetalleVacio();
+          }
+        });
+      });
+    }
 
     // tarjetas de gramática: pinchar despliega y fija el resaltado
     el.gramatica.addEventListener('click', function (e) {
@@ -575,10 +697,10 @@
       tarjeta.classList.toggle('abierta', !abierta);
       if (!abierta && tarjeta.dataset.marca) {
         marcaSeleccionada = tarjeta.dataset.marca;
+        tokenFijado = null;
         resaltarMarca(marcaSeleccionada);
       } else {
-        marcaSeleccionada = null;
-        limpiarResaltado();
+        soltarSeleccion();
       }
     });
     el.gramatica.addEventListener('keydown', function (e) {
@@ -589,9 +711,22 @@
     });
   }
 
+  /* Deja la aplicación instalada en el dispositivo: sin conexión sigue
+   * funcionando y el diccionario no se vuelve a descargar. No tiene sentido
+   * (ni está permitido) en file://, que es como la carga el envoltorio
+   * de Android, donde los ficheros ya están dentro. */
+  function registrarServicio() {
+    if (!('serviceWorker' in navigator)) return;
+    if (location.protocol !== 'http:' && location.protocol !== 'https:') return;
+    navigator.serviceWorker.register('sw.js').catch(function () { /* da igual */ });
+  }
+
   function iniciar() {
     window.Lexico.iniciar();
+    registrarServicio();
     conectarEventos();
+
+    aplicarTinta(tintaInicial());
 
     var guardado = leer('texto');
     var clave = leer('clave');

@@ -244,10 +244,11 @@ main { padding: 20px; max-width: 1400px; margin: 0 auto; }
   align-items: center;
   vertical-align: bottom;
   margin: 0 1px 10px;
-  padding: 1px 3px 3px;
+  padding: 3px 4px 5px;
   border-radius: 5px;
-  cursor: default;
+  cursor: pointer;
   transition: background .1s;
+  -webkit-tap-highlight-color: transparent;
 }
 .palabra:hover { background: var(--acento-suave); }
 
@@ -299,11 +300,12 @@ main { padding: 20px; max-width: 1400px; margin: 0 auto; }
 body.sin-papeles .han { border-bottom-color: transparent !important; }
 body.sin-papeles .seg { border-bottom-color: transparent !important; }
 
-/* resaltado al pasar el cursor o al elegir una construcción */
-.palabra.activa { background: var(--acento-suave); box-shadow: inset 0 0 0 1px var(--borde-fuerte); }
+/* Resaltado. Se marca lo activo en vez de atenuar todo lo demás: atenuar
+ * media pantalla obliga a repintarla entera, que en tinta electrónica es lo
+ * más caro que hay. */
+.palabra.activa { background: var(--acento-suave); box-shadow: inset 0 0 0 2px var(--acento); }
 .palabra.clave .han { font-weight: 650; }
-body.enfocando .palabra:not(.activa) { opacity: .32; }
-body.enfocando .seg:not(.activa) { opacity: .32; }
+.seg.activa { background: var(--acento-suave); box-shadow: 0 0 0 2px var(--acento); border-radius: 3px; }
 
 /* --------------------------- panel de español -------------------------- */
 
@@ -315,10 +317,11 @@ body.enfocando .seg:not(.activa) { opacity: .32; }
   padding-bottom: 1px;
   margin-right: 5px;
   border-radius: 2px;
-  cursor: default;
+  cursor: pointer;
   transition: background .1s;
+  -webkit-tap-highlight-color: transparent;
 }
-.seg:hover, .seg.activa { background: var(--acento-suave); }
+.seg:hover { background: var(--acento-suave); }
 .seg.solo-ingles { color: var(--texto-suave); font-style: italic; }
 .seg.solo-ingles::after { content: " (en inglés)"; font-size: 10.5px; color: var(--texto-tenue); font-style: normal; }
 .frase-es .seg:last-of-type { margin-right: 0; }
@@ -366,7 +369,7 @@ body.enfocando .seg:not(.activa) { opacity: .32; }
 }
 .leyenda:empty { display: none; }
 .leyenda span { display: inline-flex; align-items: center; gap: 5px; cursor: help; }
-.leyenda i { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
+.leyenda i { width: 16px; height: 3px; border-radius: 2px; display: inline-block; background: currentColor; }
 
 /* ------------------------------ gramática ------------------------------ */
 
@@ -417,30 +420,49 @@ body.enfocando .seg:not(.activa) { opacity: .32; }
 
 .vacio { color: var(--texto-tenue); font-size: 13.5px; padding: 8px 0; }
 
-/* ------------------------------- ficha --------------------------------- */
+/* ---------------------- detalle de la palabra tocada --------------------- */
 
-.ficha {
-  position: absolute;
-  z-index: 60;
-  max-width: 300px;
-  background: var(--fondo-panel);
-  border: 1px solid var(--borde-fuerte);
+/* Vive dentro del panel, en un sitio fijo, y se reescribe al tocar otra
+ * palabra. No flota sobre el texto: en tinta electrónica, una ventanita que
+ * aparece y desaparece deja fantasmas y tapa justo lo que estás leyendo. */
+.detalle {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--borde);
   border-radius: 10px;
-  box-shadow: var(--sombra);
-  padding: 11px 13px;
-  font-size: 13px;
-  pointer-events: none;
+  background: var(--fondo-hundido);
+  font-size: 13.5px;
+  min-height: 72px;
 }
-.ficha .f-han { font-family: var(--fuente-han); font-size: 24px; line-height: 1.2; }
-.ficha .f-py { color: var(--acento); font-size: 14px; margin-bottom: 6px; }
-.ficha .f-cat { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--texto-tenue); }
-.ficha .f-es { margin: 5px 0; }
-.ficha .f-en { color: var(--texto-suave); font-size: 12px; font-style: italic; }
-.ficha .f-extra { margin-top: 7px; padding-top: 7px; border-top: 1px solid var(--borde); font-size: 12px; color: var(--texto-suave); }
-.ficha .etiqueta-hsk {
-  display: inline-block; background: var(--acento-suave); color: var(--acento);
-  border-radius: 4px; padding: 1px 5px; font-size: 11px; font-weight: 600; margin-left: 6px;
+.detalle.detalle-vacio {
+  color: var(--texto-tenue);
+  font-size: 12.5px;
+  display: flex;
+  align-items: center;
 }
+.detalle.detalle-vacio p { margin: 0; }
+
+.d-cabecera { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.d-identidad { flex: 1; min-width: 0; }
+.d-titulo { font-size: 15px; font-weight: 650; margin-bottom: 4px; }
+.f-han { font-family: var(--fuente-han); font-size: 30px; line-height: 1.1; }
+.f-py { color: var(--acento); font-size: 15px; }
+.f-cat { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--texto-tenue); }
+.f-es { margin: 7px 0 0; font-size: 14.5px; }
+.f-en { color: var(--texto-suave); font-size: 12.5px; font-style: italic; margin-top: 2px; }
+.f-extra { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--borde); font-size: 12.5px; color: var(--texto-suave); }
+.etiqueta-hsk {
+  background: var(--acento-suave); color: var(--acento);
+  border-radius: 4px; padding: 2px 7px; font-size: 11px; font-weight: 600;
+}
+
+.d-marcas { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.chip {
+  font: inherit; font-size: 12px; cursor: pointer; text-align: left;
+  border: 1px solid var(--borde-fuerte); background: var(--fondo-panel);
+  color: var(--texto-suave); border-radius: 999px; padding: 5px 13px;
+}
+.chip:hover { border-color: var(--acento); color: var(--acento); }
 
 /* ------------------------------- modal --------------------------------- */
 
@@ -501,4 +523,153 @@ body.enfocando .seg:not(.activa) { opacity: .32; }
   .cabecera { padding: 10px 14px; }
   .lema { display: none; }
   .entrada { font-size: 18px; }
+}
+
+/* ======================= modo tinta electrónica =========================
+ *
+ * Pensado para un lector de tinta electrónica (un Boox y parecidos). Tres
+ * cosas cambian respecto a una pantalla normal:
+ *
+ *   1. Cada cambio en pantalla cuesta un repintado y deja fantasmas, así que
+ *      fuera animaciones, transiciones, sombras y elementos fijos.
+ *   2. No hay matices: el contraste se lleva al máximo, negro sobre blanco.
+ *   3. El color de un Kaleido 3 sale muy lavado, así que los papeles
+ *      sintácticos se distinguen también por el ESTILO del subrayado. Aunque
+ *      la pantalla esté en blanco y negro, un subrayado doble sigue siendo un
+ *      verbo y uno de puntos sigue siendo una circunstancia.
+ */
+
+body.tinta {
+  --fondo: #ffffff;
+  --fondo-panel: #ffffff;
+  --fondo-hundido: #f2f2f2;
+  --borde: #9a9a9a;
+  --borde-fuerte: #000000;
+  --texto: #000000;
+  --texto-suave: #2b2b2b;
+  --texto-tenue: #4f4f4f;
+  --acento: #000000;
+  --acento-suave: #dcdcdc;
+  --sombra: none;
+
+  /* Tonos oscuros y saturados: en escala de grises siguen siendo distintos. */
+  --c-sujeto: #0b3fa8;
+  --c-tema: #3a1d9e;
+  --c-verbo: #9c0000;
+  --c-objeto: #0a5c25;
+  --c-circunstancia: #7a4100;
+  --c-coverbo: #5c1080;
+  --c-modal: #00525e;
+  --c-aspecto: #4a4a4a;
+  --c-complemento: #8a3200;
+  --c-negacion: #8c0045;
+  --c-conector: #28268f;
+  --c-final: #4a4a4a;
+  --c-atributo: #00525e;
+  --c-neutro: #6b6b6b;
+
+  font-size: 17px;
+}
+
+body.tinta *,
+body.tinta *::before,
+body.tinta *::after {
+  transition: none !important;
+  animation: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+/* Una cabecera pegada arriba se repinta en cada desplazamiento. */
+body.tinta .cabecera { position: static; border-bottom: 2px solid #000; }
+body.tinta .logo { background: #000; border-radius: 0; }
+
+body.tinta .panel,
+body.tinta .gramatica,
+body.tinta .detalle,
+body.tinta .tarjeta,
+body.tinta .entrada,
+body.tinta .campo { border-color: #000; border-radius: 4px; }
+body.tinta .panel, body.tinta .gramatica { border-width: 2px; }
+body.tinta .aviso-vista, body.tinta .formula, body.tinta .ejemplo { border: 1px solid #9a9a9a; }
+
+/* Zonas de toque cómodas con el dedo o con el lápiz. */
+body.tinta .boton,
+body.tinta .boton-plano,
+body.tinta .pestana,
+body.tinta .chip { min-height: 44px; padding: 10px 16px; border-radius: 4px; }
+body.tinta .campo-pequeno { min-height: 44px; }
+body.tinta .opciones label { min-height: 40px; padding: 0 4px; }
+body.tinta .opciones input[type=checkbox] { width: 20px; height: 20px; }
+body.tinta .palabra { padding: 5px 6px 7px; margin: 0 2px 14px; }
+body.tinta .boton-plano.activo { background: #000; color: #fff; border-color: #000; }
+
+body.tinta .entrada { font-size: 23px; border-width: 2px; }
+body.tinta .han { font-size: 31px; }
+body.tinta .py { font-size: 14px; color: #3d3d3d; }
+body.tinta .gl { font-size: 13px; color: #2b2b2b; }
+body.tinta .salida-es { font-size: 18px; line-height: 2.2; }
+body.tinta .salida-py { font-size: 17px; }
+body.tinta .f-han { font-size: 36px; }
+body.tinta .tarjeta .detalle, body.tinta .tarjeta .contraste { color: #2b2b2b; }
+
+/* El subrayado pasa a text-decoration para poder usar cinco formas distintas.
+ * La forma dice el papel; el color lo confirma cuando la pantalla lo muestra. */
+body.tinta .han,
+body.tinta .seg {
+  border-bottom: 0 !important;
+  text-decoration-line: underline;
+  text-decoration-thickness: 2.5px;
+  text-underline-offset: 5px;
+  text-decoration-style: solid;
+  text-decoration-color: transparent;
+}
+body.tinta .p-sujeto .han,      body.tinta .seg.p-sujeto      { text-decoration-color: var(--c-sujeto); text-decoration-style: solid; }
+body.tinta .p-tema .han,        body.tinta .seg.p-tema        { text-decoration-color: var(--c-tema); text-decoration-style: solid; }
+body.tinta .p-verbo .han,       body.tinta .seg.p-verbo       { text-decoration-color: var(--c-verbo); text-decoration-style: double; }
+body.tinta .p-objeto .han,      body.tinta .seg.p-objeto      { text-decoration-color: var(--c-objeto); text-decoration-style: dashed; }
+body.tinta .p-tiempo .han,      body.tinta .seg.p-tiempo,
+body.tinta .p-lugar .han,       body.tinta .seg.p-lugar,
+body.tinta .p-adverbio .han,    body.tinta .seg.p-adverbio    { text-decoration-color: var(--c-circunstancia); text-decoration-style: dotted; }
+body.tinta .p-coverbo .han,     body.tinta .seg.p-coverbo,
+body.tinta .p-compl_coverbo .han                              { text-decoration-color: var(--c-coverbo); text-decoration-style: wavy; }
+body.tinta .p-modal .han,       body.tinta .seg.p-modal,
+body.tinta .p-foco .han,        body.tinta .seg.p-foco        { text-decoration-color: var(--c-modal); }
+body.tinta .p-aspecto .han,     body.tinta .seg.p-aspecto     { text-decoration-color: var(--c-aspecto); }
+body.tinta .p-complemento .han, body.tinta .seg.p-complemento { text-decoration-color: var(--c-complemento); }
+body.tinta .p-negacion .han,    body.tinta .seg.p-negacion    { text-decoration-color: var(--c-negacion); }
+body.tinta .p-conector .han,    body.tinta .seg.p-conector    { text-decoration-color: var(--c-conector); }
+body.tinta .p-final .han,       body.tinta .seg.p-final       { text-decoration-color: var(--c-final); }
+body.tinta.sin-papeles .han,
+body.tinta.sin-papeles .seg { text-decoration-color: transparent !important; }
+
+/* La leyenda enseña la forma, no sólo el color. */
+body.tinta .leyenda i { width: 22px; height: 0; background: none; border-bottom: 3px solid currentColor; }
+body.tinta .leyenda i.l-verbo { border-bottom-style: double; border-bottom-width: 4px; }
+body.tinta .leyenda i.l-objeto { border-bottom-style: dashed; }
+body.tinta .leyenda i.l-tiempo,
+body.tinta .leyenda i.l-lugar,
+body.tinta .leyenda i.l-adverbio { border-bottom-style: dotted; }
+body.tinta .leyenda i.l-coverbo,
+body.tinta .leyenda i.l-compl_coverbo { border-bottom-style: double; border-bottom-width: 3px; }
+
+/* Lo seleccionado se marca con un recuadro negro: se ve aunque la pantalla
+ * esté en blanco y negro puro. */
+body.tinta .palabra.activa {
+  background: #fff;
+  outline: 2px solid #000;
+  outline-offset: -1px;
+}
+body.tinta .seg.activa { background: #e0e0e0; outline: 2px solid #000; }
+body.tinta .palabra:hover, body.tinta .seg:hover { background: transparent; }
+body.tinta .tarjeta.activa { background: #ececec; border-color: #000; border-width: 2px; }
+
+/* En tinta electrónica el modo oscuro es contraproducente: se fuerza el claro. */
+@media (prefers-color-scheme: dark) {
+  body.tinta { color: #000; background: #fff; }
+}
+
+/* Quien pide menos movimiento recibe el mismo trato en cualquier pantalla. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
 }

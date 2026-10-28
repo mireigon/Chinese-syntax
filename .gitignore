@@ -2,3 +2,6 @@ tools/sources/
 tools/work/
 node_modules/
 .DS_Store
+android/libs/
+android/.trabajo/
+android/*.idsig

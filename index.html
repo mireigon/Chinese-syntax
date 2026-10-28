@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Leer chino — análisis sintáctico, pinyin y traducción</title>
 <meta name="description" content="Pega un texto en chino y obtén su análisis sintáctico, el pinyin, la traducción al español y una explicación de cada construcción gramatical.">
+<meta name="theme-color" content="#faf8f5">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%239a3412'/%3E%3Ctext x='16' y='23' font-size='21' text-anchor='middle' fill='%23fff' font-family='sans-serif'%3E%E4%B8%AD%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="css/estilo.css">
 </head>
@@ -19,6 +23,8 @@
     </div>
   </div>
   <div class="acciones-cabecera">
+    <button type="button" id="btn-tinta" class="boton-plano" aria-pressed="false"
+      title="Contraste alto y sin animaciones, para pantallas de tinta electrónica">Tinta</button>
     <button type="button" id="btn-ejemplos" class="boton-plano">Ejemplos</button>
     <button type="button" id="btn-ayuda" class="boton-plano">Cómo se usa</button>
   </div>
@@ -47,6 +53,7 @@
       </div>
 
       <div id="salida-chino" class="salida" aria-live="polite"></div>
+      <div id="detalle" class="detalle" aria-live="polite"></div>
       <div id="leyenda" class="leyenda"></div>
     </div>
 
@@ -103,9 +110,6 @@
     <div id="salida-gramatica" class="tarjetas"></div>
   </section>
 </main>
-
-<!-- ficha de la palabra sobre la que está el cursor -->
-<div id="ficha" class="ficha oculta" role="dialog" aria-label="Detalle de la palabra"></div>
 
 <!-- diálogos -->
 <div id="modal" class="modal oculta">
