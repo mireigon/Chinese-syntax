@@ -157,9 +157,19 @@ window.UITarjetas = (function () {
     sesion.destapada = true;
     el.dorso.classList.remove('oculta');
     el.dorso.textContent = '';
+    // Los botones se preparan antes de escribir el dorso, porque el dorso los
+    // coloca dentro de sí mismo, justo debajo de la definición.
+    pintarRespuestas(palabra);
     pintarDorso(palabra);
     el.acciones.classList.add('oculta');
-    pintarRespuestas(palabra);
+  }
+
+  /* Los botones viven dentro de la tarjeta, pegados a la definición, y no al
+   * final de todo: con los compuestos, la frase de ejemplo y la gramática
+   * debajo, quedaban a un scroll de distancia y había que ir a buscarlos. */
+  function colocarRespuestas() {
+    el.dorso.appendChild(el.respuestas);
+    el.respuestas.classList.remove('oculta');
   }
 
   /* ----------------------------- dorso ---------------------------------- */
@@ -193,6 +203,8 @@ window.UITarjetas = (function () {
       if (tk && tk.sandhi) notas.push('Se pronuncia «' + tk.sandhi.dicho + '»: ' + tk.sandhi.motivo);
       if (notas.length) el.dorso.appendChild(crear('div', 'f-extra', notas.join(' ')));
 
+      colocarRespuestas();
+
       if (ficha.cp && ficha.cp.length) {
         el.dorso.appendChild(seccion('Palabras que lo llevan', listaGlosas(ficha.cp)));
       }
@@ -203,8 +215,13 @@ window.UITarjetas = (function () {
         el.dorso.appendChild(seccion('En una frase', caja));
       }
       pintarGramatica(palabra);
-    } else if (ficha.dg && ficha.dg.length) {
-      el.dorso.appendChild(seccion('Palabra por palabra', desglose(ficha.dg)));
+    } else {
+      // En las tarjetas de lectura no hay definición: los botones van arriba
+      // del todo, antes del desglose del texto.
+      colocarRespuestas();
+      if (ficha.dg && ficha.dg.length) {
+        el.dorso.appendChild(seccion('Palabra por palabra', desglose(ficha.dg)));
+      }
     }
   }
 
@@ -286,7 +303,6 @@ window.UITarjetas = (function () {
 
   function pintarRespuestas(palabra) {
     el.respuestas.textContent = '';
-    el.respuestas.classList.remove('oculta');
     window.Tarjetas.previsiones(palabra).forEach(function (p, i) {
       var b = crear('button', 'respuesta r-' + p.id);
       b.type = 'button';
