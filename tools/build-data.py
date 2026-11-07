@@ -36,9 +36,15 @@ def log(*a):
     print(*a, file=sys.stderr)
 
 
+FUENTES = ['cedict.json', 'jieba-dict.txt', 'pinyin_dict.json', 'phrases_dict.json', 'hsk.json']
+
+
+def faltan_fuentes():
+    return [n for n in FUENTES if not os.path.exists(os.path.join(SRC, n))]
+
+
 def load_sources():
-    need = ['cedict.json', 'jieba-dict.txt', 'pinyin_dict.json', 'phrases_dict.json', 'hsk.json']
-    missing = [n for n in need if not os.path.exists(os.path.join(SRC, n))]
+    missing = faltan_fuentes()
     if missing:
         sys.exit('Faltan fuentes: %s\nEjecuta primero tools/fetch-sources.sh' % ', '.join(missing))
     cedict = json.load(open(os.path.join(SRC, 'cedict.json'), encoding='utf-8'))
@@ -373,5 +379,12 @@ def build_spanish():
 
 
 if __name__ == '__main__':
-    build()
+    # El glosario español y los mazos se generan desde ficheros versionados, así
+    # que se pueden rehacer sin descargar nada. El diccionario grande sí
+    # necesita las fuentes.
+    if faltan_fuentes():
+        log('Sin las fuentes descargadas: se rehacen sólo el glosario español y los mazos.')
+        log('  (para rehacer el diccionario: tools/fetch-sources.sh)')
+    else:
+        build()
     build_spanish()

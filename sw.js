@@ -6,7 +6,7 @@
  * arranca mucho más rápido: el diccionario no vuelve a descargarse nunca.
  *
  * Al cambiar la versión se descarta la caché anterior entera. */
-var VERSION = 'leerchino-v1';
+var VERSION = 'leerchino-v2';
 
 var ESENCIALES = [
   './',
@@ -24,8 +24,12 @@ var ESENCIALES = [
   './js/construcciones-3.js',
   './js/analisis.js',
   './js/traduccion.js',
+  './js/ficha.js',
   './js/ejemplos.js',
   './js/ui.js',
+  './js/tarjetas.js',
+  './js/ui-tarjetas.js',
+  './data/mazos.js',
   './data/lexicon-core.js',
   './data/chars.js',
   './data/es-lexicon.js',

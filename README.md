@@ -10,6 +10,51 @@ un mensaje, la etiqueta de un bote. No hace falta instalar nada ni conectarse a
 ningún servidor: es HTML, CSS y JavaScript sin dependencias, y el diccionario
 viaja dentro de la propia página.
 
+## Las dos pestañas
+
+**Analizar** es lo descrito más abajo: pegas un texto y se desmonta.
+
+**Tarjetas** es un sistema de repetición espaciada, al estilo de Anki, con los
+mazos importados de una exportación propia: **28 mazos de frecuencia** de cien
+caracteres cada uno, del más común al menos, más los relatos chinos. En total
+3.348 tarjetas.
+
+Al destapar una tarjeta sale todo lo que se sabe de ese carácter:
+
+- Pronunciación y traducción, tal como venían en el mazo.
+- Nivel HSK, categoría gramatical, definición inglesa y avisos de cambio de
+  tono, que los pone el diccionario de la aplicación.
+- Las **palabras compuestas** que lo llevan (了 → 了解, 为了, 受不了).
+- Una **frase de ejemplo desglosada palabra por palabra**, con pinyin y
+  significado de cada pieza.
+- Si es una palabra gramatical, **la construcción en la que participa**, con su
+  fórmula y un ejemplo: en 了 aparecen sus cuatro usos distintos. Es la misma
+  biblioteca de construcciones que usa el analizador.
+
+Después eliges cuánto te ha costado, con los cuatro botones de siempre. **Otra
+vez** la devuelve dentro de la misma sesión; **Difícil**, **Bien** y **Fácil**
+la alejan cada vez más. Debajo de cada botón pone exactamente cuándo volverá.
+El algoritmo es una versión reducida de SM-2, la misma idea que usa Anki: cada
+tarjeta guarda su facilidad y su intervalo, y acertar los multiplica mientras
+que fallar los reinicia.
+
+El progreso se guarda en el propio dispositivo, sin cuenta ni conexión. Cada
+mazo se puede reiniciar por separado.
+
+### Cambiar o ampliar los mazos
+
+Los mazos salen de una exportación de Anki en texto (`#separator:tab`), que se
+convierte con:
+
+```sh
+python3 tools/importar-anki.py tools/anki/chino_flashcards.txt
+```
+
+El importador extrae la información del HTML del reverso y la tira: la
+aplicación pinta las tarjetas con su propio aspecto, que es lo que permite que
+funcionen en modo tinta electrónica. Exportar otra vez desde Anki y volver a
+pasar el importador actualiza los mazos.
+
 ## En una tableta (Android, tinta electrónica)
 
 Hay dos maneras, y las dos funcionan **sin conexión** con el diccionario entero
@@ -157,12 +202,16 @@ js/construcciones*.js las cincuenta construcciones, con sus explicaciones
 js/analisis.js        oraciones, cláusulas y papeles sintácticos
 js/traduccion.js      traducción estructural alineada y puente con la API
 js/ejemplos.js        textos de muestra
+js/ficha.js           la ficha de una palabra, compartida por las dos pestañas
+js/tarjetas.js        repetición espaciada: qué toca estudiar y cuándo vuelve
+js/ui-tarjetas.js     interfaz de los mazos y del estudio
 js/ui.js              interfaz, resaltado cruzado y modo tinta electrónica
 sw.js                 service worker: deja la aplicación instalada y sin conexión
 manifest.webmanifest  metadatos para instalarla como aplicación
 android/              envoltorio WebView y su script de construcción
 data/*.js             diccionario generado (se versiona, no hay que construirlo)
 tools/                el pipeline que genera data/, y el glosario español a mano
+tools/importar-anki.py  convierte la exportación de Anki en data/mazos.js
 tests/motor.js        banco de pruebas del motor, sin navegador
 ```
 

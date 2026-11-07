@@ -395,7 +395,7 @@ body.sin-papeles .seg { border-bottom-color: transparent !important; }
 .tarjeta h3 { margin: 0 0 3px; font-size: 14.5px; font-weight: 650; line-height: 1.35; }
 .tarjeta .meta { font-size: 11px; color: var(--texto-tenue); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 7px; }
 .tarjeta .resumen { margin: 0 0 8px; font-size: 13.5px; }
-.tarjeta .formula {
+.formula {
   font-family: var(--fuente-han);
   font-size: 12.5px;
   background: var(--fondo-hundido);
@@ -407,10 +407,10 @@ body.sin-papeles .seg { border-bottom-color: transparent !important; }
 .tarjeta .detalle, .tarjeta .contraste { margin: 0 0 8px; font-size: 13px; color: var(--texto-suave); line-height: 1.6; }
 .tarjeta .contraste { border-left: 2px solid var(--borde-fuerte); padding-left: 9px; }
 .tarjeta .contraste::before { content: "Frente al español — "; font-weight: 600; color: var(--texto); }
-.tarjeta .ejemplo { font-size: 13px; background: var(--fondo-hundido); border-radius: 6px; padding: 7px 9px; }
-.tarjeta .ejemplo .zh { font-family: var(--fuente-han); font-size: 16px; }
-.tarjeta .ejemplo .py { display: block; }
-.tarjeta .ejemplo .es { color: var(--texto-suave); }
+.ejemplo { font-size: 13px; background: var(--fondo-hundido); border-radius: 6px; padding: 8px 10px; }
+.ejemplo .zh { font-family: var(--fuente-han); font-size: 17px; display: block; line-height: 1.5; }
+.ejemplo .py { display: block; font-size: 12px; color: var(--texto-tenue); }
+.ejemplo .es { display: block; color: var(--texto-suave); margin-top: 2px; }
 .tarjeta .cuerpo { display: none; }
 .tarjeta.abierta .cuerpo { display: block; }
 
@@ -523,6 +523,221 @@ body.sin-papeles .seg { border-bottom-color: transparent !important; }
   .cabecera { padding: 10px 14px; }
   .lema { display: none; }
   .entrada { font-size: 18px; }
+}
+
+/* ========================= tarjetas de memoria ==========================
+ *
+ * Dos pantallas: la lista de mazos y el estudio. El dorso de la tarjeta usa
+ * las mismas clases que la ficha del analizador (.f-han, .f-py, .f-es...),
+ * así que hereda su aspecto sin repetir nada.
+ */
+
+/* pestañas de la parte de arriba */
+.modos {
+  display: flex;
+  gap: 4px;
+  padding: 10px 20px 0;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.modo {
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 550;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  background: transparent;
+  color: var(--texto-suave);
+  padding: 9px 18px;
+  border-radius: 9px 9px 0 0;
+}
+.modo:hover { color: var(--texto); }
+.modo.activo {
+  background: var(--fondo-panel);
+  border-color: var(--borde);
+  color: var(--texto);
+}
+
+#modo-tarjetas { max-width: 1400px; margin: 0 auto; }
+#modo-tarjetas .panel { margin-bottom: 18px; }
+
+/* --- lista de mazos --- */
+
+.grupo-mazos { margin-bottom: 22px; }
+.grupo-mazos:last-child { margin-bottom: 0; }
+.grupo-cabecera {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap; margin-bottom: 10px;
+}
+.grupo-cabecera h3 { margin: 0; font-size: 14px; font-weight: 650; }
+.grupo-cuenta { font-size: 11.5px; color: var(--texto-tenue); }
+.grupo-cabecera.plegable { cursor: pointer; padding: 6px 0; }
+.grupo-cabecera.plegable h3::before { content: "▾ "; color: var(--texto-tenue); }
+.plegado .grupo-cabecera.plegable h3::before { content: "▸ "; }
+.plegado .lista-mazos { display: none; }
+
+.lista-mazos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+.mazo {
+  border: 1px solid var(--borde);
+  border-left: 3px solid var(--c-neutro);
+  border-radius: 10px;
+  padding: 13px 15px;
+  background: var(--fondo);
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.mazo-pendiente { border-left-color: var(--acento); }
+.mazo-cabecera { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.mazo-cabecera h4 { margin: 0; font-size: 14.5px; font-weight: 650; }
+.mazo-rango { font-size: 11.5px; color: var(--texto-tenue); font-variant-numeric: tabular-nums; }
+.mazo-muestra {
+  font-family: var(--fuente-han);
+  font-size: 19px;
+  color: var(--texto-suave);
+  line-height: 1.5;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Dos capas: lo empezado y, más oscuro, lo ya asentado. */
+.barra { position: relative; height: 5px; border-radius: 3px; background: var(--fondo-hundido); overflow: hidden; }
+.barra i { position: absolute; left: 0; top: 0; height: 100%; display: block; }
+.barra-hecho { background: var(--c-circunstancia); opacity: .45; }
+.barra-firme { background: var(--c-objeto); }
+
+.mazo-pie { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.mazo-estado { font-size: 12px; color: var(--texto-suave); }
+.mazo-reiniciar { align-self: flex-start; font-size: 11.5px; padding: 3px 8px; }
+
+/* --- dorso de la tarjeta --- */
+
+.dorso-seccion { margin-top: 15px; padding-top: 13px; border-top: 1px solid var(--borde); }
+.dorso-seccion .f-cat { margin-bottom: 8px; }
+
+.compuestos { display: flex; flex-direction: column; gap: 5px; }
+.compuesto { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.c-han { font-family: var(--fuente-han); font-size: 18px; min-width: 3.4em; }
+.c-py { font-size: 12.5px; color: var(--texto-suave); min-width: 6em; }
+.c-es { font-size: 13.5px; }
+
+.frase-ejemplo {
+  font-family: var(--fuente-han);
+  font-size: 23px;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+.desglose { display: flex; flex-wrap: wrap; gap: 10px 14px; }
+.dg-bloque {
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  max-width: 9.5em; padding-right: 13px; border-right: 1px solid var(--borde);
+}
+.dg-bloque:last-child { border-right: 0; padding-right: 0; }
+.dg-han { font-family: var(--fuente-han); font-size: 19px; line-height: 1.35; }
+.dg-py { font-size: 11.5px; color: var(--texto-tenue); }
+.dg-es { font-size: 11.5px; color: var(--texto-suave); }
+
+/* --- estudio --- */
+
+.tarjeta-estudio {
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  background: var(--fondo);
+  padding: 30px 22px;
+  min-height: 230px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.frente {
+  font-family: var(--fuente-han);
+  font-size: 76px;
+  max-width: 100%;
+  line-height: 1.15;
+  text-align: center;
+  word-break: break-all;
+}
+/* Una marca discreta para saber que es la primera vez que la ves. */
+.frente.es-nueva::after {
+  content: "nueva";
+  display: block;
+  font-family: var(--fuente);
+  font-size: 10.5px;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--texto-tenue);
+  margin-top: 10px;
+}
+.dorso {
+  width: 100%;
+  max-width: 560px;
+  border-top: 1px solid var(--borde);
+  padding-top: 18px;
+  cursor: default;
+}
+.dorso .f-han { font-size: 26px; }
+/* Las tarjetas de lectura llevan un párrafo entero delante, no un carácter. */
+.frente.frente-texto {
+  font-size: 23px;
+  line-height: 1.75;
+  text-align: left;
+  word-break: normal;
+  max-width: 44em;
+}
+.frente.frente-texto.es-nueva::after { text-align: left; }
+
+.acciones-tarjeta { display: flex; justify-content: center; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+.boton-grande { font-size: 15px; padding: 12px 34px; }
+
+.respuestas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 16px; }
+.respuesta {
+  font: inherit;
+  cursor: pointer;
+  border: 1px solid var(--borde-fuerte);
+  background: var(--fondo-panel);
+  color: var(--texto);
+  border-radius: 9px;
+  padding: 10px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-height: 62px;
+}
+.respuesta:hover { border-color: var(--acento); }
+.r-tecla { font-size: 10px; color: var(--texto-tenue); font-variant-numeric: tabular-nums; }
+.r-nombre { font-size: 13.5px; font-weight: 600; }
+.r-espera { font-size: 11.5px; color: var(--texto-suave); }
+.respuesta.r-0 { border-color: var(--c-negacion); }
+.respuesta.r-0 .r-nombre { color: var(--c-negacion); }
+.respuesta.r-3 { border-color: var(--c-objeto); }
+.respuesta.r-3 .r-nombre { color: var(--c-objeto); }
+
+.dorso-gramatica { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--borde); }
+.dorso-gramatica .f-cat { margin-bottom: 8px; }
+.uso { margin-bottom: 12px; }
+.uso:last-child { margin-bottom: 0; }
+.uso-titulo { font-size: 13.5px; font-weight: 600; margin-bottom: 5px; }
+.uso .formula { margin-bottom: 6px; }
+
+.pista-teclado { text-align: center; font-size: 11.5px; color: var(--texto-tenue); margin: 12px 0 0; }
+#resumen-sesion .f-es { font-size: 15px; }
+
+@media (max-width: 560px) {
+  .respuestas { grid-template-columns: repeat(2, 1fr); }
+  .frente { font-size: 60px; }
+  .modos { padding: 8px 14px 0; }
 }
 
 /* ======================= modo tinta electrónica =========================
@@ -673,3 +888,37 @@ body.tinta .tarjeta.activa { background: #ececec; border-color: #000; border-wid
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }
+
+/* ---------------- tarjetas de memoria en tinta electrónica --------------- */
+
+body.tinta .modo { border-radius: 4px 4px 0 0; min-height: 44px; }
+body.tinta .modo.activo { border-color: #000; border-width: 2px; border-bottom: 0; }
+body.tinta .mazo { border-color: #000; border-radius: 4px; border-left-width: 4px; }
+body.tinta .mazo-pendiente { border-left-color: #000; }
+body.tinta .barra { background: #e2e2e2; border: 1px solid #9a9a9a; height: 7px; }
+body.tinta .barra-hecho { background: #9a9a9a; opacity: 1; }
+body.tinta .barra-firme { background: #000; }
+body.tinta .mazo-muestra { font-size: 21px; color: #000; }
+
+body.tinta .tarjeta-estudio { border: 2px solid #000; border-radius: 4px; min-height: 260px; }
+body.tinta .frente { font-size: 92px; }
+body.tinta .respuesta { border: 2px solid #000; border-radius: 4px; min-height: 68px; padding: 12px 6px; }
+body.tinta .respuesta .r-nombre { color: #000; font-size: 15px; }
+body.tinta .respuesta .r-espera { color: #2b2b2b; font-size: 12.5px; }
+/* El color no distingue nada en una pantalla sin color: lo hace el grosor. */
+body.tinta .respuesta.r-0 { border-style: dashed; }
+body.tinta .respuesta.r-3 { border-width: 3px; }
+body.tinta .boton-grande { min-height: 56px; font-size: 17px; }
+body.tinta .dorso-gramatica { border-top: 2px solid #000; }
+body.tinta .uso-titulo { font-size: 15px; }
+body.tinta .frase-ejemplo { font-size: 26px; }
+body.tinta .dg-han { font-size: 21px; }
+body.tinta .dg-py, body.tinta .dg-es { font-size: 12.5px; color: #2b2b2b; }
+body.tinta .dg-bloque { border-right-color: #9a9a9a; }
+body.tinta .c-han { font-size: 20px; }
+body.tinta .dorso-seccion { border-top: 2px solid #000; }
+body.tinta .grupo-cabecera { border-bottom: 1px solid #9a9a9a; padding-bottom: 6px; }
+body.tinta .frente.frente-texto { font-size: 25px; }
+body.tinta .ejemplo { border: 1px solid #9a9a9a; background: #f2f2f2; }
+body.tinta .ejemplo .zh { font-size: 20px; }
+body.tinta .ejemplo .py, body.tinta .ejemplo .es { color: #2b2b2b; }

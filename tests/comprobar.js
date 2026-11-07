@@ -18,12 +18,19 @@ var ctx = {
 ctx.window = ctx;
 vm.createContext(ctx);
 ['data/lexicon-core.js', 'data/chars.js', 'data/es-lexicon.js', 'data/meta.js',
+ 'data/mazos.js',
  'js/lexico.js', 'js/glosa.js', 'js/pinyin.js', 'js/segmentador.js', 'js/etiquetas.js',
  'js/patrones.js', 'js/construcciones.js', 'js/construcciones-2.js',
- 'js/construcciones-3.js', 'js/analisis.js', 'js/traduccion.js'
+ 'js/construcciones-3.js', 'js/analisis.js', 'js/traduccion.js', 'js/tarjetas.js'
 ].forEach(function (f) {
   vm.runInContext(fs.readFileSync(path.join(raiz, f), 'utf8'), ctx, { filename: f });
 });
+ctx.localStorage = {
+  _d: {},
+  getItem: function (k) { return this._d[k] || null; },
+  setItem: function (k, v) { this._d[k] = v; },
+  removeItem: function (k) { delete this._d[k]; }
+};
 ctx.Lexico.iniciar();
 
 var fallos = 0, pruebas = 0;
@@ -193,6 +200,48 @@ function es(texto) { return ctx.Traduccion.literal(analizar(texto)).texto; }
   comprobar('«' + caso[0] + '» se traduce con «' + caso[1] + '»',
     got.indexOf(caso[1]) >= 0, 'sale: ' + got);
 });
+
+/* --------------------------- tarjetas --------------------------- */
+
+comprobar('los mazos se cargan', ctx.Tarjetas.iniciar() > 3000,
+  'tarjetas: ' + ctx.Tarjetas.iniciar());
+
+var grupos = ctx.Tarjetas.grupos();
+var frecuencia = grupos.filter(function (g) { return g.nombre === 'Frecuencia'; })[0];
+comprobar('hay 28 mazos de frecuencia', frecuencia && frecuencia.mazos.length === 28,
+  frecuencia ? 'salen ' + frecuencia.mazos.length : 'no existe el grupo');
+comprobar('los mazos de frecuencia llevan 100 tarjetas salvo el último',
+  frecuencia && frecuencia.mazos.slice(0, 27).every(function (m) { return m.total === 100; }));
+comprobar('el grupo de frecuencia va primero', grupos[0] && grupos[0].nombre === 'Frecuencia');
+
+var ficha了 = ctx.Tarjetas.ficha('了');
+comprobar('las fichas traen pinyin, glosa, compuestos y desglose',
+  ficha了 && ficha了.py && ficha了.es && ficha了.cp && ficha了.dg && ficha了.fr,
+  JSON.stringify(Object.keys(ficha了 || {})));
+
+comprobar('una palabra gramatical enlaza con sus construcciones',
+  ctx.Tarjetas.construccionesDe('把').length >= 1 &&
+  ctx.Tarjetas.construccionesDe('了').length >= 2);
+comprobar('una palabra corriente no enlaza con ninguna',
+  ctx.Tarjetas.construccionesDe('水').length === 0);
+
+// El planificador: aciertos seguidos espacian, fallar reinicia.
+var intervalos = [];
+for (var rep = 0; rep < 4; rep++) intervalos.push(ctx.Tarjetas.responder('水', 2).dias);
+comprobar('los intervalos crecen al acertar', intervalos.join(',') === '1,3,8,20',
+  'salen ' + intervalos.join(','));
+comprobar('fallar reinicia el intervalo y la tarjeta vuelve en la sesión',
+  ctx.Tarjetas.responder('水', 0).enSesion === true &&
+  ctx.Tarjetas.datosDe('水').intervalo === 0);
+comprobar('la previsión no toca el estado guardado', (function () {
+  var antes = JSON.stringify(ctx.Tarjetas.datosDe('水'));
+  ctx.Tarjetas.previsiones('水');
+  return JSON.stringify(ctx.Tarjetas.datosDe('水')) === antes;
+})());
+comprobar('reiniciar borra el progreso', (function () {
+  ctx.Tarjetas.reiniciar(['水']);
+  return ctx.Tarjetas.datosDe('水') === null;
+})());
 
 /* --------------------------- resumen --------------------------- */
 

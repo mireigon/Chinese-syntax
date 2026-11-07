@@ -30,7 +30,13 @@
   </div>
 </header>
 
+<nav class="modos" role="tablist" aria-label="Modo">
+  <button type="button" class="modo activo" data-modo="analizar" role="tab" aria-selected="true">Analizar</button>
+  <button type="button" class="modo" data-modo="tarjetas" role="tab" aria-selected="false">Tarjetas</button>
+</nav>
+
 <main>
+ <div id="modo-analizar">
   <section class="paneles">
 
     <!-- ------------------------------- chino ------------------------------ -->
@@ -109,6 +115,54 @@
     </div>
     <div id="salida-gramatica" class="tarjetas"></div>
   </section>
+ </div>
+
+ <!-- ------------------------- tarjetas de memoria ------------------------ -->
+ <div id="modo-tarjetas" class="oculta">
+
+  <section id="vista-mazos" class="panel">
+    <div class="panel-cabecera">
+      <h2>Mazos</h2>
+      <div class="opciones">
+        <label for="op-nuevas">nuevas por sesión</label>
+        <select id="op-nuevas" class="campo campo-pequeno">
+          <option value="10">10</option>
+          <option value="20" selected>20</option>
+          <option value="50">50</option>
+          <option value="-1">todas</option>
+        </select>
+      </div>
+    </div>
+    <p class="aviso-vista" id="resumen-global"></p>
+    <div id="lista-mazos" class="lista-mazos"></div>
+  </section>
+
+  <section id="vista-estudio" class="panel oculta">
+    <div class="panel-cabecera">
+      <h2 id="titulo-estudio">Mazo</h2>
+      <div class="opciones">
+        <span id="progreso-estudio" class="contador"></span>
+        <button type="button" id="btn-volver-mazos" class="boton-plano">Volver a los mazos</button>
+      </div>
+    </div>
+
+    <div id="tarjeta" class="tarjeta-estudio">
+      <div id="frente" class="frente"></div>
+      <div id="dorso" class="dorso oculta"></div>
+    </div>
+
+    <div id="acciones-tarjeta" class="acciones-tarjeta">
+      <button type="button" id="btn-destapar" class="boton boton-grande">Mostrar</button>
+    </div>
+    <div id="respuestas" class="respuestas oculta"></div>
+    <p id="pista-teclado" class="pista-teclado"></p>
+  </section>
+
+  <section id="vista-fin" class="panel oculta">
+    <div class="panel-cabecera"><h2>Sesión terminada</h2></div>
+    <div id="resumen-sesion"></div>
+  </section>
+ </div>
 </main>
 
 <!-- diálogos -->
@@ -140,7 +194,11 @@
 <script src="js/construcciones-3.js"></script>
 <script src="js/analisis.js"></script>
 <script src="js/traduccion.js"></script>
+<script src="data/mazos.js"></script>
+<script src="js/ficha.js"></script>
+<script src="js/tarjetas.js"></script>
 <script src="js/ejemplos.js"></script>
+<script src="js/ui-tarjetas.js"></script>
 <script src="js/ui.js"></script>
 </body>
 </html>

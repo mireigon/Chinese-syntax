@@ -302,52 +302,18 @@
   }
 
   function pintarDetalle(tk) {
-    var f = el.detalle;
-    f.textContent = '';
-    f.classList.remove('detalle-vacio');
-
-    var cab = crear('div', 'd-cabecera');
-    cab.appendChild(crear('span', 'f-han', tk.texto));
-    var bloque = crear('div', 'd-identidad');
-    if (tk.py) bloque.appendChild(crear('div', 'f-py', tk.py));
-    if (tk.categoria) bloque.appendChild(crear('div', 'f-cat', tk.categoria));
-    cab.appendChild(bloque);
-    if (tk.hsk) cab.appendChild(crear('span', 'etiqueta-hsk', 'HSK ' + tk.hsk));
-    f.appendChild(cab);
-
-    var gl = window.Glosa.de(tk);
-    if (gl.origen === 'glosario' || gl.origen === 'compuesta' || gl.origen === 'reduplicada') {
-      f.appendChild(crear('div', 'f-es', tk.es || gl.texto));
-    }
-    if (tk.en) f.appendChild(crear('div', 'f-en', tk.en));
-    if (!tk.es && !tk.en && tk.tipo === 'hanzi') {
-      f.appendChild(crear('div', 'f-es', 'Sin definición en el diccionario.'));
-    }
-
-    var extras = [];
-    if (tk.papel && window.Analisis.PAPELES[tk.papel] && tk.papel !== 'otro' && tk.papel !== 'puntuacion') {
-      extras.push('Función: ' + window.Analisis.PAPELES[tk.papel].nombre.toLowerCase() + '.');
-    }
-    if (tk.notaPy) extras.push(tk.notaPy.charAt(0).toUpperCase() + tk.notaPy.slice(1) + '.');
-    if (tk.sandhi) extras.push('Se pronuncia «' + tk.sandhi.dicho + '»: ' + tk.sandhi.motivo);
-    if (extras.length) f.appendChild(crear('div', 'f-extra', extras.join(' ')));
-
-    // Construcciones que tocan esta palabra: se puede saltar a su explicación.
+    var marcas = [];
     if (tk.marcas && tk.marcas.length && analisisActual) {
-      var fila = crear('div', 'd-marcas');
       tk.marcas.forEach(function (id) {
         var m = analisisActual.marcas.filter(function (x) { return x.id === id; })[0];
-        if (!m) return;
-        var b = crear('button', 'chip', m.titulo);
-        b.type = 'button';
-        b.addEventListener('click', function (ev) {
-          ev.stopPropagation();
-          abrirTarjeta(id);
-        });
-        fila.appendChild(b);
+        if (m) marcas.push(m);
       });
-      if (fila.childNodes.length) f.appendChild(fila);
     }
+    window.Ficha.render(tk, el.detalle, {
+      papel: true,
+      marcas: marcas,
+      alPulsarMarca: abrirTarjeta
+    });
   }
 
   function pintarDetalleMarca(m) {
@@ -554,6 +520,19 @@
       'explicación completa, la fórmula, la comparación con el español y un ejemplo canónico. Al ',
       'pincharla también se resalta en los dos paneles la parte de la frase a la que se refiere.</p>',
 
+      '<h3>La pestaña «Tarjetas»</h3>',
+      '<p>Es un sistema de repetición espaciada como el de Anki, con tus mazos: 28 de ',
+      'frecuencia de cien caracteres cada uno (del más común al menos), más los relatos. ',
+      'Destapa la tarjeta y sale todo lo que sabemos de ese carácter: pronunciación, ',
+      'significado, palabras compuestas que lo llevan, una frase de ejemplo desglosada ',
+      'palabra por palabra y, si es una palabra gramatical, la construcción en la que ',
+      'participa con su fórmula.</p>',
+      '<p>Después eliges cuánto te ha costado: <strong>Otra vez</strong> la devuelve dentro ',
+      'de la misma sesión, y <strong>Difícil</strong>, <strong>Bien</strong> o ',
+      '<strong>Fácil</strong> la alejan cada vez más en el tiempo. Debajo de cada botón ',
+      'pone exactamente cuándo volverá. El progreso se guarda en el dispositivo, así que no ',
+      'hace falta cuenta ni conexión.</p>',
+
       '<h3>Por dónde empezar si no sabes nada</h3>',
       '<p>Pon el nivel en «sólo lo básico» y quédate con tres ideas: en chino los verbos no se ',
       'conjugan (el tiempo lo dan palabras como 昨天 o partículas como 了), los modificadores van ',
@@ -570,6 +549,21 @@
   }
 
   /* ------------------------------- arranque ----------------------------- */
+
+  /* --------------------------- modos de la app -------------------------- */
+
+  function cambiarModo(modo) {
+    $('#modo-analizar').classList.toggle('oculta', modo !== 'analizar');
+    $('#modo-tarjetas').classList.toggle('oculta', modo !== 'tarjetas');
+    Array.prototype.forEach.call(document.querySelectorAll('.modo'), function (b) {
+      var activo = b.dataset.modo === modo;
+      b.classList.toggle('activo', activo);
+      b.setAttribute('aria-selected', activo ? 'true' : 'false');
+    });
+    guardar('modo', modo);
+    // Al volver a las tarjetas puede haber cambiado el día: se recuentan.
+    if (modo === 'tarjetas' && window.UITarjetas) window.UITarjetas.refrescar();
+  }
 
   /* -------------------------- tinta electrónica ------------------------- */
 
@@ -603,6 +597,10 @@
 
     $('#btn-tinta').addEventListener('click', function () {
       aplicarTinta(!document.body.classList.contains('tinta'));
+    });
+
+    Array.prototype.forEach.call(document.querySelectorAll('.modo'), function (b) {
+      b.addEventListener('click', function () { cambiarModo(b.dataset.modo); });
     });
 
     ['#op-pinyin', '#op-glosa'].forEach(function (sel) {
@@ -655,7 +653,9 @@
     }
 
     document.addEventListener('click', function (e) {
-      if (e.target.closest && e.target.closest('.detalle')) return;
+      if (!e.target.closest) return;
+      if (e.target.closest('#modo-tarjetas') || e.target.closest('.modos')) return;
+      if (e.target.closest('.detalle')) return;
       var i = tokenDelEvento(e.target);
       if (i >= 0) {
         if (tokenFijado === i) soltarSeleccion();
@@ -727,6 +727,14 @@
     conectarEventos();
 
     aplicarTinta(tintaInicial());
+
+    if (window.UITarjetas && window.UITarjetas.montar()) {
+      cambiarModo(leer('modo') === 'tarjetas' ? 'tarjetas' : 'analizar');
+    } else {
+      // Sin datos de mazos, la pestaña no sirve de nada: se esconde.
+      var pestana = document.querySelector('.modo[data-modo="tarjetas"]');
+      if (pestana) pestana.classList.add('oculta');
+    }
 
     var guardado = leer('texto');
     var clave = leer('clave');
