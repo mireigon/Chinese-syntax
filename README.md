@@ -229,6 +229,8 @@ data/*.js             diccionario generado (se versiona, no hay que construirlo)
 tools/                el pipeline que genera data/, y el glosario español a mano
 tools/importar-anki.py  convierte la exportación de Anki en data/mazos.js
 tests/motor.js        banco de pruebas del motor, sin navegador
+tests/comprobar.js    comprobaciones del motor con resultado esperado
+tests/navegador.js    pruebas de interacción en un navegador de verdad
 ```
 
 El paso difícil es el primero: el chino se escribe sin espacios, así que antes
@@ -248,6 +250,18 @@ node tests/motor.js "你好，你叫什么名字？"   # analiza lo que le pases
 
 Imprime, para cada frase, la segmentación con pinyin y papeles, la traducción
 estructural y las construcciones detectadas.
+
+`tests/comprobar.js` fija el comportamiento del motor en 80 casos. Y como ése
+corre sin DOM y no ve los fallos de interfaz, hay además una prueba en un
+navegador de verdad:
+
+```sh
+npm i playwright
+node tests/navegador.js
+```
+
+Levanta el servidor por su cuenta y comprueba el toque en el analizador y el
+ciclo completo de una tarjeta. Si playwright no está instalado, se salta sola.
 
 ### Regenerar el diccionario
 

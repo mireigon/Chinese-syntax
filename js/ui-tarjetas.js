@@ -310,7 +310,10 @@ window.UITarjetas = (function () {
       b.appendChild(crear('span', 'r-tecla', String(i + 1)));
       b.appendChild(crear('span', 'r-nombre', p.nombre));
       b.appendChild(crear('span', 'r-espera', etiquetaEspera(p)));
-      b.addEventListener('click', function () { calificar(p.id); });
+      b.addEventListener('click', function (ev) {
+        ev.stopPropagation();
+        calificar(p.id);
+      });
       el.respuestas.appendChild(b);
     });
   }
@@ -417,8 +420,12 @@ window.UITarjetas = (function () {
       nuevasPorSesion = +this.value; guardar('nuevas', this.value);
     });
     $('#btn-destapar').addEventListener('click', destapar);
-    $('#tarjeta').addEventListener('click', function () {
-      if (sesion && !sesion.destapada) destapar();
+    $('#tarjeta').addEventListener('click', function (ev) {
+      if (!sesion || sesion.destapada) return;
+      // Los botones de respuesta viven dentro de la tarjeta: pulsarlos no es
+      // un toque para destapar.
+      if (ev.target.closest && ev.target.closest('button, a, input, textarea, select')) return;
+      destapar();
     });
     $('#btn-volver-mazos').addEventListener('click', irAMazos);
     document.addEventListener('keydown', alPulsarTecla);
