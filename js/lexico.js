@@ -115,10 +115,14 @@ window.Lexico = (function () {
     return res;
   }
 
+  /** Recorre todas las entradas: fn(palabra, datos). */
+  function recorrer(fn) { entradas.forEach(function (e, w) { fn(w, e); }); }
+
   return {
     iniciar: iniciar,
     cargarAmpliacion: cargarAmpliacion,
     buscar: buscar,
+    recorrer: recorrer,
     existe: existe,
     pinyinDeCaracter: pinyinDeCaracter,
     porPrefijo: porPrefijo,

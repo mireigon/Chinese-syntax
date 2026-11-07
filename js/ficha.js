@@ -31,6 +31,7 @@ window.Ficha = (function () {
    * opciones.papel    muestra la función que cumple en la frase (sólo tiene
    *                   sentido dentro de un análisis, no en una tarjeta suelta)
    * opciones.sinHanzi omite el carácter, para cuando ya se ve en grande
+   * opciones.antes    se llama con el contenedor ya vacío, antes de la ficha
    * opciones.marcas   construcciones a las que saltar, con su callback
    */
   function render(tk, destino, opciones) {
@@ -38,6 +39,7 @@ window.Ficha = (function () {
     destino.textContent = '';
     destino.classList.remove('detalle-vacio');
     if (!tk) return;
+    if (opciones.antes) opciones.antes(destino);
 
     var cab = crear('div', 'd-cabecera');
     if (!opciones.sinHanzi) cab.appendChild(crear('span', 'f-han', tk.texto));
@@ -53,7 +55,7 @@ window.Ficha = (function () {
       destino.appendChild(crear('div', 'f-es', tk.es || gl.texto));
     }
     if (tk.en) destino.appendChild(crear('div', 'f-en', tk.en));
-    if (!tk.es && !tk.en && tk.tipo === 'hanzi') {
+    if (!tk.es && !tk.en && tk.tipo === 'hanzi' && !(tk.explorado && tk.texto.length === 1)) {
       destino.appendChild(crear('div', 'f-es', 'Sin definición en el diccionario.'));
     }
 

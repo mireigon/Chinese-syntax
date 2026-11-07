@@ -301,6 +301,224 @@
       : 'Toca una palabra para ver su pronunciación, su significado y su función en la frase.'));
   }
 
+  /* Exploración: desde la palabra tocada se puede saltar a sus caracteres, a
+   * los de su serie fonética o a otras palabras que los contienen. El rastro
+   * guarda el camino; su primer elemento es siempre el token de la frase. */
+  var rastro = [];
+
+  function esHan(ch) {
+    return ch.length === 2 || /[⺀-⿟㐀-鿿豈-﫿]/.test(ch);
+  }
+
+  /** Token de mentira para una palabra que no está en la frase. */
+  function tokenDeExploracion(w) {
+    var e = window.Lexico.buscar(w) || {};
+    var py = e.py ? e.py.split(' / ')[0]
+      : Array.from(w).map(window.Lexico.pinyinDeCaracter).join(' ');
+    var cats = window.Etiquetas.CATEGORIAS;
+    return {
+      texto: w, tipo: 'hanzi', py: py, en: e.en || '', es: e.es || '', hsk: e.hsk || 0,
+      categoria: e.pos ? (cats[e.pos] || cats[e.pos[0]] || '') : '',
+      marcas: [], explorado: true
+    };
+  }
+
+  function explorar(w) {
+    rastro.push(w);
+    pintarDetalle(tokenDeExploracion(w));
+  }
+
+  function volverA(indice) {
+    rastro = rastro.slice(0, indice + 1);
+    var paso = rastro[indice];
+    pintarDetalle(typeof paso === 'string' ? tokenDeExploracion(paso) : paso);
+  }
+
+  function chipExplorar(w, resto, clase, py) {
+    var b = crear('button', 'chip chip-zh' + (clase ? ' ' + clase : ''));
+    b.type = 'button';
+    b.dataset.explorar = w;
+    b.appendChild(crear('span', 'zh', w));
+    if (py) b.appendChild(crear('span', 'chip-py', py));
+    if (resto && resto.ingles) b.appendChild(crear('span', 'chip-resto chip-ingles', resto.texto));
+    else if (resto) b.appendChild(crear('span', 'chip-resto', resto));
+    return b;
+  }
+
+  function pintarRastro(f) {
+    if (rastro.length < 2) return;
+    var nav = crear('div', 'd-rastro');
+    rastro.forEach(function (paso, i) {
+      var texto = typeof paso === 'string' ? paso : paso.texto;
+      if (i) nav.appendChild(crear('span', 'd-rastro-sep', '›'));
+      if (i === rastro.length - 1) { nav.appendChild(crear('span', 'd-rastro-actual zh', texto)); return; }
+      var b = crear('button', 'd-rastro-paso zh', texto);
+      b.type = 'button';
+      b.dataset.rastro = i;
+      nav.appendChild(b);
+    });
+    f.appendChild(nav);
+  }
+
+  /** Glosa corta de una entrada del diccionario, en español si la hay. El
+   *  inglés se devuelve marcado ({ texto, ingles }) para pintarlo distinto. */
+  function glosaCorta(e) {
+    if (!e) return '';
+    var g = e.es ? window.Glosa.primeraAcepcion(e.es) : window.Glosa.primeraAcepcion(e.en || '');
+    if (g.length > 28) g = g.slice(0, 27) + '…';
+    return g && !e.es ? { texto: g, ingles: true } : g;
+  }
+
+  /* Nota propia del carácter. Se guarda sola al dejar de escribir y al salir
+   * del campo; si otra pantalla la cambia, se actualiza aquí salvo que se
+   * esté escribiendo en ella. */
+  function pintarNota(bloque, ch) {
+    var cab = crear('div', 'd-sub d-sub-nota');
+    cab.appendChild(document.createTextNode('Mi nota'));
+    var estado = crear('span', 'd-nota-estado', '');
+    cab.appendChild(estado);
+    bloque.appendChild(cab);
+
+    var ta = crear('textarea', 'd-mia');
+    ta.rows = 2;
+    ta.spellcheck = false;
+    ta.dataset.notaChar = ch;
+    ta.placeholder = 'Por qué creo que ' + ch + ' se escribe y se pronuncia así…';
+    ta.value = window.Notas.leer(ch);
+    bloque.appendChild(ta);
+
+    var temporizador = null;
+    var ultimo = ta.value;
+    function guardarYa() {
+      clearTimeout(temporizador);
+      temporizador = null;
+      if (ta.value === ultimo) return;
+      ultimo = ta.value;
+      estado.textContent = 'guardando…';
+      window.Notas.guardar(ch, ta.value).then(function () {
+        estado.textContent = window.Notas.modo() === 'local' ? 'guardada en este dispositivo' : 'guardada';
+      }).catch(function (err) {
+        estado.textContent = err && err.code === 'quota_exceeded'
+          ? 'no cabe: la base de notas está llena' : 'no se pudo guardar';
+      });
+    }
+    ta.addEventListener('input', function () {
+      estado.textContent = '';
+      clearTimeout(temporizador);
+      temporizador = setTimeout(guardarYa, 900);
+    });
+    ta.addEventListener('blur', guardarYa);
+  }
+
+  /* Por cada carácter: estructura, origen (sólo si la fuente lo trae), serie
+   * fonética y palabras frecuentes que lo contienen. */
+  function pintarCaracteres(f, texto) {
+    var chars = Array.from(texto).filter(esHan);
+    var unico = chars.length === 1;
+    var vistos = {};
+    chars = chars.filter(function (c) { return vistos[c] ? false : (vistos[c] = true); }).slice(0, 4);
+    if (!chars.length) return;
+
+    var zona = crear('div', 'd-chars');
+    chars.forEach(function (ch) {
+      var fi = window.Hanzi.ficha(ch);
+      var bloque = crear('div', 'd-char');
+
+      var cab = crear('div', 'd-char-cab');
+      if (unico) cab.appendChild(crear('span', 'd-char-han zh', ch));
+      else cab.appendChild(chipExplorar(ch, '', 'chip-grande'));
+      cab.appendChild(crear('span', 'f-py', window.Lexico.pinyinDeCaracter(ch)));
+      if (!unico) {
+        var g = glosaCorta(window.Lexico.buscar(ch));
+        if (g) cab.appendChild(crear('span', 'd-char-gl' + (g.ingles ? ' chip-ingles' : ''), g.texto || g));
+      }
+      if (fi && fi.nombreTipo) cab.appendChild(crear('span', 'f-cat', fi.nombreTipo));
+      bloque.appendChild(cab);
+
+      if (!fi) {
+        bloque.appendChild(crear('p', 'd-nota', 'Sin datos de estructura en la fuente.'));
+      } else if (fi.tipo === 'f') {
+        // En los 形声 de la fuente la pista es la categoría de significado
+        // («palabra», «metal»); si es una frase entera se muestra aparte.
+        var pistaCorta = fi.pista && !/[⺀-鿿]/.test(fi.pista) && fi.pista.split(' ').length <= 3;
+        var linea = crear('div', 'd-formula');
+        if (fi.semantico) {
+          linea.appendChild(chipExplorar(fi.semantico, pistaCorta ? '«' + fi.pista + '»' : '', 'chip-pieza'));
+          linea.appendChild(crear('span', 'd-papel', 'significado'));
+          linea.appendChild(crear('span', 'd-mas', '+'));
+        }
+        linea.appendChild(chipExplorar(fi.fonetico, fi.pyFonetico, 'chip-pieza'));
+        linea.appendChild(crear('span', 'd-papel', 'sonido'));
+        bloque.appendChild(linea);
+        if (fi.pista && !pistaCorta) bloque.appendChild(crear('p', 'd-pista', fi.pista));
+        var sonidos = {
+          igual: 'Suena igual que ' + fi.fonetico + ' (salvo, quizá, el tono).',
+          parecido: 'Suena parecido a ' + fi.fonetico + ': la pista de sonido sigue sirviendo a medias.',
+          distinto: 'El sonido de ' + fi.fonetico + ' ya no se reconoce: la pronunciación ha cambiado con los siglos.'
+        };
+        if (sonidos[fi.sonido]) bloque.appendChild(crear('p', 'd-nota', sonidos[fi.sonido]));
+      } else {
+        if (fi.piezas.length > 1 || fi.piezas[0] !== ch) {
+          var lp = crear('div', 'd-formula');
+          fi.piezas.forEach(function (p, i) {
+            if (p === ch) return;
+            if (i) lp.appendChild(crear('span', 'd-mas', '+'));
+            lp.appendChild(chipExplorar(p, glosaCorta(window.Lexico.buscar(p)), 'chip-pieza'));
+          });
+          if (lp.childNodes.length) bloque.appendChild(lp);
+        }
+        if (fi.pista) bloque.appendChild(crear('p', 'd-pista', fi.pista));
+        else if (fi.tipo) bloque.appendChild(crear('p', 'd-nota', 'La fuente no explica su origen.'));
+        else bloque.appendChild(crear('p', 'd-nota', 'Sin datos de origen en la fuente.'));
+      }
+
+      var parecidos = window.Hanzi.parecidos(ch);
+      if (parecidos.length) {
+        bloque.appendChild(crear('div', 'd-sub d-sub-confusion', 'No confundir con'));
+        var fc = crear('div', 'd-fila');
+        parecidos.forEach(function (p) {
+          fc.appendChild(chipExplorar(p, glosaCorta(window.Lexico.buscar(p)), 'chip-confusion',
+            window.Lexico.pinyinDeCaracter(p)));
+        });
+        bloque.appendChild(fc);
+      }
+
+      pintarNota(bloque, ch);
+
+      if (fi && fi.serie.length) {
+        bloque.appendChild(crear('div', 'd-sub', 'Misma pieza de sonido ' + fi.fonetico));
+        var fs = crear('div', 'd-fila');
+        fi.serie.forEach(function (s) {
+          fs.appendChild(chipExplorar(s.caracter, s.py, s.igual ? 'chip-igual' : ''));
+        });
+        bloque.appendChild(fs);
+      }
+
+      if (fi && fi.daSonidoA.length) {
+        bloque.appendChild(crear('div', 'd-sub', ch + ' da el sonido a'));
+        var fd = crear('div', 'd-fila');
+        fi.daSonidoA.forEach(function (s) {
+          fd.appendChild(chipExplorar(s.caracter, s.py, s.igual ? 'chip-igual' : ''));
+        });
+        bloque.appendChild(fd);
+      }
+
+      var palabras = window.Hanzi.palabrasCon(ch, unico ? 10 : 6)
+        .filter(function (p) { return p.palabra !== texto; });
+      if (palabras.length) {
+        bloque.appendChild(crear('div', 'd-sub', 'Palabras con ' + ch));
+        var fp = crear('div', 'd-fila');
+        palabras.forEach(function (p) {
+          fp.appendChild(chipExplorar(p.palabra, glosaCorta(p.datos), '',
+            (p.datos.py || '').split(' / ')[0]));
+        });
+        bloque.appendChild(fp);
+      }
+      zona.appendChild(bloque);
+    });
+    f.appendChild(zona);
+  }
+
   function pintarDetalle(tk) {
     var marcas = [];
     if (tk.marcas && tk.marcas.length && analisisActual) {
@@ -312,8 +530,11 @@
     window.Ficha.render(tk, el.detalle, {
       papel: true,
       marcas: marcas,
-      alPulsarMarca: abrirTarjeta
+      alPulsarMarca: abrirTarjeta,
+      // Las migas de pan van arriba del todo, antes de la propia ficha.
+      antes: pintarRastro
     });
+    if (tk.tipo === 'hanzi') pintarCaracteres(el.detalle, tk.texto);
   }
 
   function pintarDetalleMarca(m) {
@@ -333,6 +554,7 @@
     if (!tk) return;
     if (fijar) { tokenFijado = indice; marcaSeleccionada = null; }
     resaltarTokens([indice]);
+    rastro = [tk];
     pintarDetalle(tk);
   }
 
@@ -622,7 +844,11 @@
     $('#modal-cerrar').addEventListener('click', cerrarModal);
     el.modal.addEventListener('click', function (e) { if (e.target === el.modal) cerrarModal(); });
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') { cerrarModal(); soltarSeleccion(); }
+      if (e.key === 'Escape') {
+        // Escape dentro de una nota sólo sale del campo: no tira la ficha.
+        if (e.target && e.target.classList && e.target.classList.contains('d-mia')) { e.target.blur(); return; }
+        cerrarModal(); soltarSeleccion();
+      }
     });
 
     // pestañas del panel español
@@ -651,6 +877,19 @@
       }
       return -1;
     }
+
+    // Dentro de la ficha: saltar a otro carácter o palabra, o volver atrás.
+    el.detalle.addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('[data-explorar], [data-rastro]') : null;
+      if (!b) return;
+      // La ficha se repinta y el botón deja de estar en el documento: sin
+      // esto, el manejador general lo tomaría por un toque fuera y soltaría
+      // la selección.
+      e.stopPropagation();
+      if (b.dataset.rastro != null) volverA(+b.dataset.rastro);
+      else explorar(b.dataset.explorar);
+      if (el.detalle.getBoundingClientRect().top < 0) el.detalle.scrollIntoView({ block: 'start' });
+    });
 
     document.addEventListener('click', function (e) {
       if (!e.target.closest) return;
@@ -723,6 +962,13 @@
 
   function iniciar() {
     window.Lexico.iniciar();
+    window.Hanzi.iniciar();
+    window.Notas.iniciar();
+    window.Notas.alCambiar(function (ch) {
+      Array.prototype.forEach.call(el.detalle.querySelectorAll('textarea.d-mia'), function (ta) {
+        if (ta.dataset.notaChar === ch && document.activeElement !== ta) ta.value = window.Notas.leer(ch);
+      });
+    });
     registrarServicio();
     conectarEventos();
 

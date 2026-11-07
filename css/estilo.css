@@ -922,3 +922,77 @@ body.tinta .frente.frente-texto { font-size: 25px; }
 body.tinta .ejemplo { border: 1px solid #9a9a9a; background: #f2f2f2; }
 body.tinta .ejemplo .zh { font-size: 20px; }
 body.tinta .ejemplo .py, body.tinta .ejemplo .es { color: #2b2b2b; }
+
+/* ------------------------ caracteres y exploración ------------------------
+ * Va dentro de la ficha de detalle: estructura de cada carácter, su serie
+ * fonética y las palabras que lo contienen. Todo lo que tiene caracteres es
+ * un botón que lleva a su propia ficha. */
+
+.zh { font-family: var(--fuente-han); }
+
+.d-rastro {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 4px;
+  margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--borde);
+  font-size: 15px;
+}
+.d-rastro-paso {
+  font: inherit; font-family: var(--fuente-han); cursor: pointer;
+  background: transparent; border: 0; color: var(--acento);
+  text-decoration: underline; text-underline-offset: 3px; padding: 4px 4px;
+}
+.d-rastro-sep { color: var(--texto-tenue); }
+.d-rastro-actual { font-weight: 650; padding: 4px; }
+
+.d-chars { margin-top: 10px; display: grid; gap: 10px; }
+.d-char {
+  padding: 10px 12px; border: 1px solid var(--borde); border-radius: 8px;
+  background: var(--fondo-panel);
+}
+.d-char-cab { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; margin-bottom: 6px; }
+.d-char-han { font-size: 26px; line-height: 1.1; }
+.d-char-gl { font-size: 13px; color: var(--texto-suave); }
+.d-formula { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin: 4px 0; }
+.d-papel { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--texto-tenue); }
+.d-mas { color: var(--texto-tenue); font-size: 16px; margin: 0 2px; }
+.d-pista { margin: 6px 0 2px; font-size: 13.5px; font-style: italic; }
+.d-pista::before { content: "Origen: "; font-style: normal; font-weight: 600; color: var(--texto-suave); }
+.d-nota { margin: 4px 0 0; font-size: 12.5px; color: var(--texto-suave); }
+.d-sub {
+  margin: 10px 0 4px; font-size: 11px; font-weight: 650; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--texto-tenue);
+}
+.d-fila { display: flex; flex-wrap: wrap; gap: 5px; }
+
+.chip-zh { display: inline-flex; align-items: baseline; gap: 6px; padding: 4px 11px; color: var(--texto); }
+.chip-zh .zh { font-size: 17px; }
+.chip-resto { font-size: 12px; color: var(--texto-suave); }
+.chip-py { font-size: 12.5px; color: var(--acento); white-space: nowrap; }
+.chip-grande .zh { font-size: 24px; }
+.chip-ingles { font-style: italic; }
+.chip-pieza { border-radius: 8px; }
+.chip-igual { border-color: var(--acento); }
+.chip-igual .chip-resto { color: var(--acento); font-weight: 600; }
+
+/* «No confundir con»: los parecidos, grandes, para comparar el trazo. */
+.chip-confusion .zh { font-size: 26px; line-height: 1.1; }
+body.tinta .chip-confusion .zh { font-size: 32px; }
+
+/* Nota propia: un campo discreto dentro de la ficha de cada carácter. */
+.d-sub-nota { display: flex; align-items: baseline; gap: 8px; }
+.d-nota-estado { font-weight: 400; text-transform: none; letter-spacing: 0; font-size: 11px; color: var(--texto-tenue); }
+.d-mia {
+  width: 100%; resize: vertical; min-height: 48px;
+  font: inherit; font-size: 13.5px; line-height: 1.5;
+  padding: 7px 9px; border-radius: 6px;
+  border: 1px dashed var(--borde-fuerte);
+  background: var(--fondo); color: var(--texto);
+}
+.d-mia:focus { outline: 2px solid var(--acento); outline-offset: -1px; border-style: solid; }
+.d-mia::placeholder { color: var(--texto-tenue); font-style: italic; }
+body.tinta .d-mia { border: 2px solid #000; font-size: 16px; min-height: 64px; }
+
+body.tinta .d-char { border-color: #000; }
+body.tinta .chip-zh { min-height: 44px; padding: 8px 12px; }
+body.tinta .chip-zh .zh { font-size: 20px; }
+body.tinta .chip-igual { border-width: 2px; }
+body.tinta .d-rastro-paso { min-height: 44px; padding: 8px; color: #000; }

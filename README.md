@@ -162,6 +162,20 @@ Todo lo que se enciende a la vez está enlazado: tocar una palabra china enciend
 su pinyin y su traducción; tocar la traducción enciende el chino del que salió.
 Tocar otra vez suelta la selección.
 
+**Dentro de la ficha, cada carácter se puede abrir.** De qué piezas está hecho,
+si es pictograma, ideograma o semántico-fonético, y de dónde viene. Si es
+semántico-fonético se dice claro cuál de las dos piezas da el sonido y cuánto
+de ese sonido conserva, en vez de inventar una historia: el 70 % de los
+caracteres funcionan así y es lo que de verdad ayuda a recordarlos. Debajo, los
+caracteres que se le parecen a la vista («no confundir con»), un hueco para tu
+propia nota y las palabras frecuentes que lo llevan. Todo lo que tiene
+caracteres es un botón que lleva a su ficha, y las migas de pan de arriba
+permiten volver.
+
+Las notas propias se guardan en el dispositivo; en la versión publicada se
+guardan además en la base del artifact, así que se ven igual en el ordenador y
+en el lector.
+
 ## Qué reconoce
 
 Cincuenta construcciones, agrupadas por familias:
@@ -203,6 +217,8 @@ js/analisis.js        oraciones, cláusulas y papeles sintácticos
 js/traduccion.js      traducción estructural alineada y puente con la API
 js/ejemplos.js        textos de muestra
 js/ficha.js           la ficha de una palabra, compartida por las dos pestañas
+js/hanzi.js           estructura, origen y parentesco de cada carácter
+js/notas.js           notas propias por carácter
 js/tarjetas.js        repetición espaciada: qué toca estudiar y cuándo vuelve
 js/ui-tarjetas.js     interfaz de los mazos y del estudio
 js/ui.js              interfaz, resaltado cruzado y modo tinta electrónica
@@ -313,7 +329,8 @@ Conviene saber dónde falla, porque falla:
 | [CC-CEDICT](https://cc-cedict.org/) | 116.000 entradas con pinyin, definición inglesa y nivel HSK | CC BY-SA 4.0 |
 | [jieba](https://github.com/fxsjy/jieba) | frecuencias y etiquetas morfosintácticas | MIT |
 | [pypinyin](https://github.com/mozillazg/python-pinyin) | tablas de pinyin de caracteres y palabras | MIT |
+| [Make Me a Hanzi](https://github.com/skishore/makemeahanzi) | descomposición, tipo y origen de los caracteres | LGPL |
 
-El glosario español, las explicaciones gramaticales y el código son originales
-de este repositorio. Al redistribuir hay que mantener la atribución de CC-CEDICT
+Los mazos de tarjetas son del usuario, exportados de Anki. El glosario español,
+las explicaciones gramaticales y el código son originales de este repositorio. Al redistribuir hay que mantener la atribución de CC-CEDICT
 y su licencia compartida.
