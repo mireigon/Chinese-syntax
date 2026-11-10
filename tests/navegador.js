@@ -23,10 +23,20 @@ var TIPOS = {
   '.webmanifest': 'application/manifest+json'
 };
 
+// El sello de versión lo escribe la build (android/construir.sh), no el
+// repositorio, así que aquí se sirve uno de mentira para poder comprobar que
+// la cabecera lo enseña.
+var VERSION_PRUEBA = '9.9 (prueba)';
+
 function servidor() {
   return http.createServer(function (req, res) {
     var rel = decodeURIComponent(req.url.split('?')[0]);
     if (rel === '/') rel = '/index.html';
+    if (rel === '/data/version.js') {
+      res.writeHead(200, { 'content-type': TIPOS['.js'] });
+      res.end('window.LEERCHINO_VERSION = "' + VERSION_PRUEBA + '";\n');
+      return;
+    }
     var fichero = path.join(RAIZ, rel);
     if (fichero.indexOf(RAIZ) !== 0 || !fs.existsSync(fichero)) {
       res.writeHead(404); res.end(); return;
@@ -100,6 +110,22 @@ async function ejecutar(pw) {
   await page.evaluate(function () {
     try { localStorage.clear(); } catch (e) { /* bloqueado */ }
   });
+
+  /* ----------------------------- versión ------------------------------ */
+
+  // Sin esto no hay forma de saber desde la tableta qué build está instalada,
+  // y es facilísimo instalar una descarga vieja creyendo que es la nueva.
+  var sello = await page.evaluate(function () {
+    var c = document.querySelector('#version-cabecera');
+    return {
+      cabecera: c ? c.textContent : null,
+      visible: !!(c && c.getBoundingClientRect().width > 0),
+      pie: (document.querySelector('#version-app') || {}).textContent
+    };
+  });
+  comprobar('la cabecera enseña la versión', sello.cabecera === 'v' + VERSION_PRUEBA && sello.visible,
+    JSON.stringify(sello));
+  comprobar('el pie también la enseña', sello.pie === 'versión ' + VERSION_PRUEBA, sello.pie);
 
   /* ---------------------------- analizador ---------------------------- */
 

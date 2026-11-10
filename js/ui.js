@@ -989,11 +989,16 @@
     analizar();
 
     // Saber qué build se está usando evita el lío de instalar un APK viejo
-    // encima de uno nuevo: todos se llaman igual.
-    var sello = $('#version-app');
-    if (sello && window.LEERCHINO_VERSION) {
-      sello.textContent = 'versión ' + window.LEERCHINO_VERSION;
-      sello.insertAdjacentHTML('afterend', '<span class="separador">·</span>');
+    // encima de uno nuevo. Va en la cabecera, donde se ve sin bajar, y
+    // también en el pie.
+    if (window.LEERCHINO_VERSION) {
+      var enCabecera = $('#version-cabecera');
+      if (enCabecera) enCabecera.textContent = 'v' + window.LEERCHINO_VERSION;
+      var sello = $('#version-app');
+      if (sello) {
+        sello.textContent = 'versión ' + window.LEERCHINO_VERSION;
+        sello.insertAdjacentHTML('afterend', '<span class="separador">·</span>');
+      }
     }
 
     el.estadoDicc.textContent = window.Lexico.tamano().toLocaleString('es-ES') + ' palabras cargadas';

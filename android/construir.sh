@@ -132,5 +132,14 @@ for necesario in data/mazos.js data/hanzi.js js/tarjetas.js js/hanzi.js js/notas
 done
 
 rm -rf "$TRABAJO"
+
+# Copia con la versión en el nombre. Los navegadores no sobrescriben las
+# descargas, las renombran («leer-chino (1).apk»), así que un nombre fijo
+# acaba sirviendo para instalar siempre el mismo fichero viejo sin notarlo.
+ETIQUETADO="$AQUI/leer-chino-${VERSION_NAME%% *}.apk"
+rm -f "$AQUI"/leer-chino-*.apk
+cp "$SALIDA" "$ETIQUETADO"
+
 echo
-echo "Listo: $SALIDA  ($(du -h "$SALIDA" | cut -f1))"
+echo "Listo: $SALIDA"
+echo "       $ETIQUETADO  ($(du -h "$SALIDA" | cut -f1))"

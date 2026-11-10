@@ -110,6 +110,22 @@ body {
 }
 .cabecera h1 { margin: 0; font-size: 17px; font-weight: 650; letter-spacing: -.01em; }
 .lema { margin: 0; font-size: 12.5px; color: var(--texto-suave); }
+/* La versión, pegada al título: es lo primero que hay que poder mirar cuando
+ * algo «no ha cambiado» tras instalar. No se esconde en pantallas pequeñas. */
+.version-chip {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .02em;
+  color: var(--texto-tenue);
+  background: var(--fondo-hundido);
+  border: 1px solid var(--borde);
+  border-radius: 5px;
+  padding: 1px 6px;
+  vertical-align: 2px;
+  white-space: nowrap;
+}
+.version-chip:empty { display: none; }
+body.tinta .version-chip { border: 1px solid #000; color: #000; background: #fff; font-size: 12px; }
 .acciones-cabecera { display: flex; gap: 6px; }
 
 /* -------------------------------- base -------------------------------- */
