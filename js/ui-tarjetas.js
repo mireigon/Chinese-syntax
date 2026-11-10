@@ -215,6 +215,7 @@ window.UITarjetas = (function () {
         el.dorso.appendChild(seccion('En una frase', caja));
       }
       pintarGramatica(palabra);
+      pintarCaracteresDorso(palabra, ficha);
     } else {
       // En las tarjetas de lectura no hay definición: los botones van arriba
       // del todo, antes del desglose del texto.
@@ -289,6 +290,55 @@ window.UITarjetas = (function () {
     el.dorso.appendChild(seccion(
       construcciones.length === 1 ? 'Cómo funciona' : 'Cómo funciona (' + construcciones.length + ' usos)',
       caja));
+  }
+
+  /* Lo mismo que enseña el analizador al tocar una palabra: de qué piezas
+   * está hecho cada carácter, cuál le da el sonido y a quién se lo da, con qué
+   * no confundirlo, palabras que lo llevan y la nota propia. Los chips
+   * exploran dentro de esta misma sección, con su rastro para volver: la
+   * tarjeta y sus botones de respuesta se quedan donde estaban. */
+  function pintarCaracteresDorso(palabra, ficha) {
+    if (!Array.from(palabra).some(window.Caracteres.esHan)) return;
+    var zona = crear('div', 'dorso-chars');
+    // «Palabras con» no repite los compuestos que ya trae el propio mazo.
+    var excluir = (ficha.cp || []).map(function (c) { return c[0]; });
+    var camino = [palabra];
+
+    function pintar() {
+      zona.textContent = '';
+      var actual = camino[camino.length - 1];
+      if (camino.length > 1) {
+        var nav = crear('div', 'd-rastro');
+        camino.forEach(function (paso, i) {
+          if (i) nav.appendChild(crear('span', 'd-rastro-sep', '›'));
+          if (i === camino.length - 1) { nav.appendChild(crear('span', 'd-rastro-actual zh', paso)); return; }
+          var b = crear('button', 'd-rastro-paso zh', paso);
+          b.type = 'button';
+          b.dataset.rastro = i;
+          nav.appendChild(b);
+        });
+        zona.appendChild(nav);
+        var explorada = crear('div', 'dorso-explorada');
+        window.Ficha.render(window.Caracteres.token(actual), explorada, {});
+        zona.appendChild(explorada);
+      }
+      window.Caracteres.pintar(zona, actual, camino.length === 1 ? { excluir: excluir } : null);
+    }
+
+    zona.addEventListener('click', function (ev) {
+      var b = ev.target.closest ? ev.target.closest('[data-explorar], [data-rastro]') : null;
+      if (!b) return;
+      ev.stopPropagation();
+      if (b.dataset.rastro != null) camino = camino.slice(0, +b.dataset.rastro + 1);
+      else camino.push(b.dataset.explorar);
+      pintar();
+      if (zona.getBoundingClientRect().top < 0) zona.scrollIntoView({ block: 'start' });
+    });
+
+    pintar();
+    el.dorso.appendChild(seccion(
+      Array.from(palabra).filter(window.Caracteres.esHan).length > 1 ? 'Sus caracteres' : 'El carácter',
+      zona));
   }
 
   /* ---------------------------- respuestas ------------------------------ */

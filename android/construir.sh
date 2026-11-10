@@ -124,7 +124,7 @@ if [ "$CODIGO_REAL" != "$VERSION_CODE" ]; then
   echo "ERROR: el APK dice versionCode=$CODIGO_REAL y esperábamos $VERSION_CODE." >&2
   exit 1
 fi
-for necesario in data/mazos.js data/hanzi.js js/tarjetas.js js/hanzi.js js/notas.js; do
+for necesario in data/mazos.js data/hanzi.js js/tarjetas.js js/hanzi.js js/notas.js js/caracteres.js; do
   if ! unzip -l "$SALIDA" "assets/www/$necesario" >/dev/null 2>&1; then
     echo "ERROR: falta assets/www/$necesario dentro del APK." >&2
     exit 1

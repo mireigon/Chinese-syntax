@@ -122,6 +122,7 @@ window.ZH_CONFUSABLES = `他	池
 李	季
 汉	汊仅
 海	诲侮
+每	毒母
 眼	限
 破	皱
 通	逼
@@ -311,7 +312,7 @@ window.ZH_CONFUSABLES = `他	池
 柄	桶栖梢
 校	枝梭姣
 棣	棒
-母	毋
+母	毋每
 注	住
 混	温
 温	混

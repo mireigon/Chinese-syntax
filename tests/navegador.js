@@ -169,9 +169,30 @@ async function ejecutar(pw) {
   var antes = await estado();
   comprobar('la tarjeta empieza tapada', antes.tapada && antes.mostrar);
 
+  function bloqueCaracteres() {
+    return page.evaluate(function () {
+      var z = document.querySelector('#dorso .dorso-chars');
+      return {
+        visible: !!(z && z.getBoundingClientRect().height > 0),
+        subs: z ? Array.prototype.map.call(z.querySelectorAll('.d-sub'), function (n) {
+          return n.textContent;
+        }) : []
+      };
+    });
+  }
+  comprobar('el bloque de caracteres no se ve antes de destapar', !(await bloqueCaracteres()).visible);
+
   await page.tap('#tarjeta');
   await page.waitForTimeout(300);
   comprobar('tocar la tarjeta la destapa', !(await estado()).tapada);
+
+  // Lo que enseña el analizador al tocar un carácter tiene que estar también
+  // en el dorso: hubo un tiempo en que sólo vivía en el analizador.
+  var bloque = await bloqueCaracteres();
+  comprobar('al destapar sale el bloque de caracteres con su nota',
+    bloque.visible && bloque.subs.indexOf('Mi nota') >= 0 &&
+    bloque.subs.some(function (t) { return /^Palabras con /.test(t); }),
+    JSON.stringify(bloque.subs));
 
   var dentro = await page.evaluate(function () {
     return document.querySelector('#dorso').contains(document.querySelector('#respuestas'));
@@ -198,6 +219,11 @@ async function ejecutar(pw) {
     if (!(e.tapada && e.mostrar)) malas++;
     if (e.tapada) { await page.tap('#tarjeta'); await page.waitForTimeout(220); }
   }
+  if ((await estado()).tapada) { await page.tap('#tarjeta'); await page.waitForTimeout(220); }
+  await page.tap('.respuesta.r-2');
+  await page.waitForTimeout(280);
+  comprobar('tras responder, el bloque de caracteres vuelve a ocultarse',
+    (await estado()).tapada && !(await bloqueCaracteres()).visible);
   comprobar('tras responder, la siguiente tarjeta sale tapada', malas === 0,
     malas + ' de 6 salieron destapadas');
 
