@@ -6,7 +6,7 @@
  * arranca mucho más rápido: el diccionario no vuelve a descargarse nunca.
  *
  * Al cambiar la versión se descarta la caché anterior entera. */
-var VERSION = 'leerchino-v3';
+var VERSION = 'leerchino-v4';
 
 var ESENCIALES = [
   './',

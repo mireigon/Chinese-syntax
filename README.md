@@ -67,6 +67,12 @@ dentro del dispositivo.
 9 MB, pide Android 5 o posterior y sólo usa el permiso de internet, que
 únicamente hace falta para la traducción con IA.
 
+La **versión sale en el pie de la aplicación** («versión 1.9 (a1b2c3d)»), y el
+`versionCode` lo pone `construir.sh` a partir del número de commits, así que
+siempre crece y Android no deja instalar una build anterior encima de una
+posterior. Si echas algo en falta, mira ahí primero: todos los APK se llaman
+igual y es fácil instalar uno viejo sin darse cuenta.
+
 Es un envoltorio de la aplicación web: un WebView a pantalla completa con todos
 los ficheros dentro del propio APK. La ventaja sobre el navegador es que la
 tableta lo trata como una aplicación más, así que en un Boox se le puede fijar

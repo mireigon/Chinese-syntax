@@ -31,6 +31,22 @@ mkdir -p "$LIBS"
 [ -f "$LIBS/android.jar" ] || curl -sSL --retry 3 -o "$LIBS/android.jar" "$ANDROID_JAR_URL"
 [ -f "$LIBS/dx.jar" ]      || curl -sSL --retry 3 -o "$LIBS/dx.jar" "$DX_URL"
 
+# La versión sale del propio git, para que no se pueda olvidar subirla: el
+# versionCode es el número de commits (siempre crece, que es lo que Android
+# exige para dejar actualizar) y el nombre lleva el commit, para poder mirar
+# dentro de la aplicación qué build estás usando.
+VERSION_CODE="$(git -C "$RAIZ" rev-list --count HEAD 2>/dev/null || echo 1)"
+COMMIT="$(git -C "$RAIZ" rev-parse --short HEAD 2>/dev/null || echo '?')"
+# El propio APK queda modificado en cada build: no cuenta como cambio suelto.
+SUCIO=""
+git -C "$RAIZ" diff --quiet -- . ':(exclude)android/leer-chino.apk' 2>/dev/null || SUCIO="+"
+VERSION_NAME="1.${VERSION_CODE} (${COMMIT}${SUCIO})"
+echo "==> Versión ${VERSION_NAME}, código ${VERSION_CODE}"
+
+# Si algo falla a mitad, el APK anterior sigue en disco y es facilísimo
+# enviarlo creyendo que es el recién hecho. Se borra antes de empezar.
+rm -f "$SALIDA"
+
 echo "==> Preparando los assets (la aplicación web entera)"
 rm -rf "$TRABAJO"
 mkdir -p "$TRABAJO/assets/www"
@@ -38,6 +54,17 @@ cp "$RAIZ/index.html" "$TRABAJO/assets/www/"
 cp -r "$RAIZ/css" "$RAIZ/js" "$RAIZ/data" "$TRABAJO/assets/www/"
 # El service worker sólo sirve en la web: aquí los ficheros ya están dentro.
 rm -f "$TRABAJO/assets/www/sw.js"
+# Sello de versión: la aplicación lo enseña en el pie, para saber de un
+# vistazo qué build se está usando.
+printf 'window.LEERCHINO_VERSION = "%s";\n' "$VERSION_NAME" > "$TRABAJO/assets/www/data/version.js"
+
+# La versión se sustituye sobre una copia del manifiesto. Las banderas
+# --version-code/--version-name de aapt no reemplazan lo que ya trae el
+# manifiesto (ni con --replace-version, en esta versión de la herramienta).
+MANIFIESTO="$TRABAJO/AndroidManifest.xml"
+sed -e "s/android:versionCode=\"[^\"]*\"/android:versionCode=\"$VERSION_CODE\"/" \
+    -e "s/android:versionName=\"[^\"]*\"/android:versionName=\"$VERSION_NAME\"/" \
+    "$AQUI/AndroidManifest.xml" > "$MANIFIESTO"
 echo "    $(find "$TRABAJO/assets/www" -type f | wc -l) ficheros, $(du -sh "$TRABAJO/assets/www" | cut -f1)"
 
 echo "==> Compilando recursos y manifiesto (aapt)"
@@ -45,7 +72,7 @@ mkdir -p "$TRABAJO/gen"
 # -0 js deja el diccionario sin comprimir: así el WebView lo lee directamente
 # del APK, sin el límite de tamaño que tienen los assets comprimidos.
 aapt package -f \
-  -M "$AQUI/AndroidManifest.xml" \
+  -M "$MANIFIESTO" \
   -S "$AQUI/res" \
   -A "$TRABAJO/assets" \
   -I "$LIBS/android.jar" \
@@ -88,6 +115,22 @@ apksigner sign \
   --out "$SALIDA" "$TRABAJO/alineado.apk"
 
 apksigner verify --print-certs "$SALIDA" | head -3
+
+# Comprobación final: que lo que ha salido es de verdad esta versión. Sin
+# esto, un fallo silencioso a mitad pasa desapercibido hasta que alguien
+# instala el APK y echa en falta lo que acabas de añadir.
+CODIGO_REAL="$(aapt dump badging "$SALIDA" | sed -n "s/.*versionCode='\([^']*\)'.*/\1/p")"
+if [ "$CODIGO_REAL" != "$VERSION_CODE" ]; then
+  echo "ERROR: el APK dice versionCode=$CODIGO_REAL y esperábamos $VERSION_CODE." >&2
+  exit 1
+fi
+for necesario in data/mazos.js data/hanzi.js js/tarjetas.js js/hanzi.js js/notas.js; do
+  if ! unzip -l "$SALIDA" "assets/www/$necesario" >/dev/null 2>&1; then
+    echo "ERROR: falta assets/www/$necesario dentro del APK." >&2
+    exit 1
+  fi
+done
+
 rm -rf "$TRABAJO"
 echo
 echo "Listo: $SALIDA  ($(du -h "$SALIDA" | cut -f1))"

@@ -3,6 +3,9 @@
     package="es.leerchino.app"
     android:versionCode="1"
     android:versionName="1.0">
+    <!-- La versión real la pone android/construir.sh a partir de git, antes
+         de compilar. Los valores de aquí sólo existen para que el manifiesto
+         sea válido por sí solo. -->
 
     <!-- Sólo hace falta red para la traducción natural con IA, que es opcional.
          Todo lo demás (diccionario, análisis, pinyin) va dentro del APK. -->
